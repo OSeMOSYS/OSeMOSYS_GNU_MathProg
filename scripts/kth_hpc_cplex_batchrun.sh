@@ -1,6 +1,6 @@
-######### High Performance Computer (HPC) specific commands (SLURM) ########
-
 #!/bin/bash 
+
+######### High Performance Computer (HPC) specific commands (SLURM) ########
 
 # Set the allocation to be charged for this job
 #SBATCH -A 2018-123
@@ -54,5 +54,3 @@ cplex < mycplexcommands
 # the sol file is input to transform python script
 #
 python transform_31072013.py matrix.sol matrix.txt
-
-
