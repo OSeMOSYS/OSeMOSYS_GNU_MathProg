@@ -1,9 +1,8 @@
 #!/bin/bash 
-
 ######### High Performance Computer (HPC) specific commands (SLURM) ########
 
 # Set the allocation to be charged for this job
-#SBATCH -A 2018-123
+#SBATCH -A 
 
 # The name of the script is myjob
 #SBATCH -J myjob
@@ -23,16 +22,16 @@
 
 ############### Here finished the SLURM commands #############
 
-# Load the glpk mode which includes glpsol, please check version
+# Load the glpk mode which includes glpsol, please check version this command is specific for Tegner
+# Set the path to glpk (need to change) if not on Tegner
 module add glpk/4.65
 
-# Set the path to cplex
-export PATH=/cfs/klemming/nobackup/n/nandi/cplex/bin/x86-64_linux/:$PATH
+# Set the path to cplex here
 
 # this command starts glpsol (GNU Mathprog) 
 # Only generate the .lp file using flag --check
 
-glpsol -m OSeMOSYS_fast.txt -d data.txt --wlp matrix.lp --check
+glpsol -m OSeMOSYS.txt -d data.txt --wlp matrix.lp --check
 
 # break mean make a new empty file for mycplexcommands
 rm -f mycplexcommands
@@ -54,3 +53,5 @@ cplex < mycplexcommands
 # the sol file is input to transform python script
 #
 python transform_31072013.py matrix.sol matrix.txt
+
+
