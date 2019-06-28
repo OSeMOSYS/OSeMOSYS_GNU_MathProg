@@ -13,6 +13,7 @@ To run: just double click the batch file and it will execute.
 
 ## kth_hpc_cplex_batchrun.sh
 
+Acknowledgment to Jing Gong at PDC center @ KTH for rewriting the script for Tegner.
 This batch script is for running one run for GNU MathProg and CPLEX on High Performance Comupter using SLURM commands
 and Linux operating system (such as Tegner @ KTH).
 Place all files together with the batch file, and make sure to change the naming
