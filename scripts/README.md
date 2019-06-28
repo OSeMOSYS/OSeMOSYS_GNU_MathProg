@@ -17,5 +17,5 @@ This batch script is for running one run for GNU MathProg and CPLEX on High Perf
 and Linux operating system (such as Tegner @ KTH).
 Place all files together with the batch file, and make sure to change the naming
 to your text files and OSeMOSyS version.
-To run on HPC Tegner @ KTH write: `1sbatch kth_hpc_cplex_batchrun.sh`
+To run on HPC Tegner @ KTH write: `sbatch kth_hpc_cplex_batchrun.sh`
 and it will queue the file and run it.
