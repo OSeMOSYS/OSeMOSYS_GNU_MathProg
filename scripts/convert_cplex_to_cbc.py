@@ -93,7 +93,10 @@ class RegionTechnology(ConvertLine):
 
                 year = 2015 + index
 
-                print(value)
+                try:
+                    value = float(value)
+                except ValueError:
+                    value = 0
 
                 formatted_data = "{0}({1},{2},{3}){4}{5:.2f}{6}0\n".format(
                     variable,
@@ -101,7 +104,7 @@ class RegionTechnology(ConvertLine):
                     technology,
                     year,
                     " " * 28,
-                    float(value),
+                    value,
                     " " * 22
                     )
 
