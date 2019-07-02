@@ -29,7 +29,30 @@ class ConvertLine(object):
     def convert(self) -> List[str]:
         """Perform the conversion
         """
-        return self._do_it()
+        cbc_data = []
+        variable, dimensions, values = self._do_it()
+
+        for index, value in enumerate(values):
+
+            year = 2015 + index
+            if (value not in ["0.0", "0", ""]) and (year <= 2050):
+
+                try:
+                    value = float(value)
+                except ValueError:
+                    value = 0
+
+                full_dims = ",".join(dimensions + (str(year),))
+
+                formatted_data = "0\t{0}({1})\t{2}\t0\n".format(
+                    variable,
+                    full_dims,
+                    value
+                    )
+
+                cbc_data.append(formatted_data)
+
+        return cbc_data
 
 
 class RegionTimeSliceTechnologyMode(ConvertLine):
@@ -47,29 +70,9 @@ class RegionTimeSliceTechnologyMode(ConvertLine):
         mode = self.data[4]
         values = self.data[5:]
 
-        cbc_data = []
+        dimensions = (region, timeslice, technology, mode)
 
-        for index, value in enumerate(values):
-
-            if value not in ["0.0", "0", ""]:
-
-                year = 2015 + index
-
-                formatted_data = "0 {0}({1},{2},{3},{4},{5}){6}{7:.2f}{8}0\n".format(
-                    variable,
-                    region,
-                    timeslice,
-                    technology,
-                    mode,
-                    year,
-                    " " * 28,
-                    float(value),
-                    " " * 22
-                    )
-
-                cbc_data.append(formatted_data)
-
-        return cbc_data
+        return (variable, dimensions, values)
 
 
 class RegionTechnology(ConvertLine):
@@ -77,40 +80,18 @@ class RegionTechnology(ConvertLine):
     def _do_it(self) -> List:
         """Produces output indexed by dimensions Region and Technology
 
-        ``VariableName(REGION,TECHCODE01,2015)       42.69         0\n``
+        ``0\tVariableName(REGION,TECHCODE01,2015)\t42.69\t0\n``
 
         """
         variable = self.data[0]
         region = self.data[1]
         technology = self.data[2]
+
+        dimensions = (region, technology)
+
         values = self.data[3:]
 
-        cbc_data = []
-
-        for index, value in enumerate(values):
-
-            if value not in ["0.0", "0", ""]:
-
-                year = 2015 + index
-
-                try:
-                    value = float(value)
-                except ValueError:
-                    value = 0
-
-                formatted_data = "0 {0}({1},{2},{3}){4}{5:.2f}{6}0\n".format(
-                    variable,
-                    region,
-                    technology,
-                    year,
-                    "\t",
-                    value,
-                    "\t"
-                    )
-
-                cbc_data.append(formatted_data)
-
-        return cbc_data
+        return (variable, dimensions, values)
 
 
 def process_line(line: str) -> Union[List, None]:
@@ -184,8 +165,10 @@ class TestCplexRead:
                     "AnnualFixedOperatingCost(REGION,CDBACKSTOP,2018)                            305945.38                      0",
                     "AnnualFixedOperatingCost(REGION,CDBACKSTOP,2019)                            626159.96                      0"]
 
-        actual = process_line(fixture)
+        convertor = process_line(fixture)
+        actual = convertor.convert()
         assert actual == expected
+
 
     def test_rate_of_activity(self):
 
@@ -202,7 +185,9 @@ class TestCplexRead:
             "RateOfActivity(REGION,S1D1,CGLFRCFURX,1,2027)                             0.067575581                      0",
             "RateOfActivity(REGION,S1D1,CGLFRCFURX,1,2028)                             0.055893663                      0",
             "RateOfActivity(REGION,S1D1,CGLFRCFURX,1,2029)                             0.043306085                      0"]
-        actual = process_line(fixture)
+
+        convertor = process_line(fixture)
+        actual = convertor.convert()
         assert actual == expected
 
 
