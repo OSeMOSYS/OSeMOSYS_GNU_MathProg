@@ -3,7 +3,9 @@
 """
 import sys
 from typing import List, Union, Tuple
-
+from pytest import mark
+from pytest import fixture
+import argparse
 
 class ConvertLine(object):
     """Abstract class which defines the interface to the family of convertors
@@ -20,16 +22,52 @@ class ConvertLine(object):
     VariableName(REGION,TECHCODE01,2017)       137958.84         0\n
     """
 
-    def __init__(self, data: List, start_year: int, end_year: int):
+    def __init__(self, data: List, start_year: int, end_year: int, output_format='cbc'):
         self.data = data
         self.start_year = start_year
         self.end_year = end_year
+        self.output_format = output_format
 
     def _do_it(self) -> Tuple:
         raise NotImplementedError()
 
     def convert(self) -> List[str]:
-        """Perform the conversion
+        if self.output_format == 'cbc':
+            convert = self.convert_cbc()
+        elif self.output_format == 'csv':
+            convert = self.convert_csv()
+        return convert
+
+    def convert_csv(self) -> List[str]:
+        """Format the data for writing to a csv file
+        """
+        data = []
+        variable, dimensions, values = self._do_it()
+
+        for index, value in enumerate(values):
+
+            year = self.start_year + index
+            if (value not in ["0.0", "0", ""]) and (year <= self.end_year):
+
+                try:
+                    value = float(value)
+                except ValueError:
+                    value = 0
+
+                full_dims = ",".join(dimensions + (str(year),))
+
+                formatted_data = '{0},"{1}",{2}\n'.format(
+                    variable,
+                    full_dims,
+                    value
+                    )
+
+                data.append(formatted_data)
+
+        return data
+
+    def convert_cbc(self) -> List[str]:
+        """Format the data for writing to a CBC file
         """
         cbc_data = []
         variable, dimensions, values = self._do_it()
@@ -96,7 +134,10 @@ class RegionTechnology(ConvertLine):
         return (variable, dimensions, values)
 
 
-def process_line(line: str, start_year, end_year) -> List[str]:
+def process_line(line: str,
+                 start_year: int,
+                 end_year: int,
+                 output_format: str) -> List[str]:
     """Processes an individual line in a CPLEX file
 
     A different ConvertLine implementation is chosen depending upon the
@@ -104,7 +145,11 @@ def process_line(line: str, start_year, end_year) -> List[str]:
 
     Arguments
     ---------
-    line : str
+    line: str
+    start_year: int
+    end_year: int
+    output_format: str
+        The file format required - either ``csv`` or ``cbc``
     """
     row_as_list = line.split('\t')
     variable = row_as_list[0]
@@ -113,16 +158,18 @@ def process_line(line: str, start_year, end_year) -> List[str]:
                     'CapitalInvestment',
                     'AnnualFixedOperatingCost',
                     'AnnualVariableOperatingCost']:
-        convertor = RegionTechnology(row_as_list, start_year, end_year).convert()
+        convertor = RegionTechnology(row_as_list, start_year, end_year, output_format).convert()
     elif variable in ['RateOfActivity']:
-        convertor = RegionTimeSliceTechnologyMode(row_as_list, start_year, end_year).convert()
+        convertor = RegionTimeSliceTechnologyMode(row_as_list, start_year, end_year, output_format).convert()
     else:
         convertor = []
 
     return convertor
 
 
-def convert_cplex_file(cplex_filename, output_filename, start_year=2015, end_year=2070):
+def convert_cplex_file(cplex_filename: str, output_filename: str,
+                       start_year=2015, end_year=2070,
+                       output_format='cbc'):
     """Converts a CPLEX solution file into that of the CBC solution file
 
     Arguments
@@ -136,67 +183,104 @@ def convert_cplex_file(cplex_filename, output_filename, start_year=2015, end_yea
     with open(output_filename, 'w') as cbc_file:
         with open(cplex_filename, 'r') as cplex_file:
             for linenum, line in enumerate(cplex_file):
-                convertor = process_line(line)
                 try:
+                    convertor = process_line(line, start_year, end_year, output_format)
                     if convertor:
-                        cbc_file.writelines(data)
+                        cbc_file.writelines(convertor)
                 except ValueError:
                     msg = "Error caused at line {}: {}"
                     raise ValueError(msg.format(linenum, line))
 
 
-class TestCplexRead:
+class TestCplexToCsv:
 
-    def test_different_format(self):
+    test_data = [
+            (
+                "AnnualFixedOperatingCost	REGION	AOBACKSTOP	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0		",
+                []),
+            (
+                "AnnualFixedOperatingCost	REGION	CDBACKSTOP	0.0	0.0	137958.8400384134	305945.38410619126	626159.9611543404	0.0	0.0	0.0	0.0	0.0	0.0	0.0	0.0	0.0	0.0	0.0	0.0	0.0	0.0	0.0	0.0	0.0	0.0	0.0	0.0	0.0	0.0	0.0	0.0	0.0	0.0	0.0	0.0	0.0	0.0	0.0	0.0	0.0	0.0	0.0	0.0	0.0	0.0	0.0	0.0	0.0	0.0	0.0	0.0	0.0	0.0	0.0	0.0	0.0	0.0	0.0",
+                [
+                'AnnualFixedOperatingCost,"REGION,CDBACKSTOP,2017",137958.8400384134\n',
+                'AnnualFixedOperatingCost,"REGION,CDBACKSTOP,2018",305945.3841061913\n',
+                'AnnualFixedOperatingCost,"REGION,CDBACKSTOP,2019",626159.9611543404\n']),
+            (
+                """RateOfActivity	REGION	S1D1	CGLFRCFURX	1	0.0	0.0	0.0	0.0	0.0	0.3284446367303371	0.3451714779880536	0.3366163200621617	0.3394945166233896	0.3137488154250392	0.28605725055560716	0.2572505015401749	0.06757558148965725	0.0558936625751148	0.04330608461292407	0.0	0.0	0.0	0.0	0.0	0.0	0.0	0.0	0.0	0.0	0.0	0.0	0.0	0.0	0.0	0.0	0.0	0.0	0.0	0.0	0.0	0.0	0.0	0.0	0.0	0.0	0.0	0.0	0.0	0.0	0.0	0.0	0.0	0.0	0.0	0.0	0.0	0.0	0.0	0.0	0.0""",
+                ['RateOfActivity,"REGION,S1D1,CGLFRCFURX,1,2020",0.3284446367303371\n',
+                 'RateOfActivity,"REGION,S1D1,CGLFRCFURX,1,2021",0.3451714779880536\n',
+                 'RateOfActivity,"REGION,S1D1,CGLFRCFURX,1,2022",0.3366163200621617\n',
+                 'RateOfActivity,"REGION,S1D1,CGLFRCFURX,1,2023",0.3394945166233896\n',
+                 'RateOfActivity,"REGION,S1D1,CGLFRCFURX,1,2024",0.3137488154250392\n',
+                 'RateOfActivity,"REGION,S1D1,CGLFRCFURX,1,2025",0.28605725055560716\n',
+                 'RateOfActivity,"REGION,S1D1,CGLFRCFURX,1,2026",0.2572505015401749\n',
+                 'RateOfActivity,"REGION,S1D1,CGLFRCFURX,1,2027",0.06757558148965725\n',
+                 'RateOfActivity,"REGION,S1D1,CGLFRCFURX,1,2028",0.0558936625751148\n',
+                 'RateOfActivity,"REGION,S1D1,CGLFRCFURX,1,2029",0.04330608461292407\n']
+            )
+        ]
 
-        fixture = "AnnualFixedOperatingCost	REGION	AOBACKSTOP	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0		"
+    @mark.parametrize("cplex_input,expected", test_data)
+    def test_convert_from_cplex_to_cbc(self, cplex_input, expected):
 
-        expected = []
-
-        actual = process_line(fixture, 2015, 2070)
+        actual = process_line(cplex_input, 2015, 2070, 'csv')
         assert actual == expected
 
-    def test_read_in_line(self):
+class TestCplexToCbc:
 
-        fixture = "AnnualFixedOperatingCost	REGION	CDBACKSTOP	0.0	0.0	137958.8400384134	305945.38410619126	626159.9611543404	0.0	0.0	0.0	0.0	0.0	0.0	0.0	0.0	0.0	0.0	0.0	0.0	0.0	0.0	0.0	0.0	0.0	0.0	0.0	0.0	0.0	0.0	0.0	0.0	0.0	0.0	0.0	0.0	0.0	0.0	0.0	0.0	0.0	0.0	0.0	0.0	0.0	0.0	0.0	0.0	0.0	0.0	0.0	0.0	0.0	0.0	0.0	0.0	0.0	0.0	0.0"
+    test_data = [
+            (
+                "AnnualFixedOperatingCost	REGION	AOBACKSTOP	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0		",
+                []),
+            (
+                "AnnualFixedOperatingCost	REGION	CDBACKSTOP	0.0	0.0	137958.8400384134	305945.38410619126	626159.9611543404	0.0	0.0	0.0	0.0	0.0	0.0	0.0	0.0	0.0	0.0	0.0	0.0	0.0	0.0	0.0	0.0	0.0	0.0	0.0	0.0	0.0	0.0	0.0	0.0	0.0	0.0	0.0	0.0	0.0	0.0	0.0	0.0	0.0	0.0	0.0	0.0	0.0	0.0	0.0	0.0	0.0	0.0	0.0	0.0	0.0	0.0	0.0	0.0	0.0	0.0	0.0",
+                [
+                "0 AnnualFixedOperatingCost(REGION,CDBACKSTOP,2017) 137958.8400384134 0\n",
+                "0 AnnualFixedOperatingCost(REGION,CDBACKSTOP,2018) 305945.3841061913 0\n",
+                "0 AnnualFixedOperatingCost(REGION,CDBACKSTOP,2019) 626159.9611543404 0\n"]),
+            (
+                """RateOfActivity	REGION	S1D1	CGLFRCFURX	1	0.0	0.0	0.0	0.0	0.0	0.3284446367303371	0.3451714779880536	0.3366163200621617	0.3394945166233896	0.3137488154250392	0.28605725055560716	0.2572505015401749	0.06757558148965725	0.0558936625751148	0.04330608461292407	0.0	0.0	0.0	0.0	0.0	0.0	0.0	0.0	0.0	0.0	0.0	0.0	0.0	0.0	0.0	0.0	0.0	0.0	0.0	0.0	0.0	0.0	0.0	0.0	0.0	0.0	0.0	0.0	0.0	0.0	0.0	0.0	0.0	0.0	0.0	0.0	0.0	0.0	0.0	0.0	0.0""",
+                ["0 RateOfActivity(REGION,S1D1,CGLFRCFURX,1,2020) 0.3284446367303371 0\n",
+                 "0 RateOfActivity(REGION,S1D1,CGLFRCFURX,1,2021) 0.3451714779880536 0\n",
+                 "0 RateOfActivity(REGION,S1D1,CGLFRCFURX,1,2022) 0.3366163200621617 0\n",
+                 "0 RateOfActivity(REGION,S1D1,CGLFRCFURX,1,2023) 0.3394945166233896 0\n",
+                 "0 RateOfActivity(REGION,S1D1,CGLFRCFURX,1,2024) 0.3137488154250392 0\n",
+                 "0 RateOfActivity(REGION,S1D1,CGLFRCFURX,1,2025) 0.28605725055560716 0\n",
+                 "0 RateOfActivity(REGION,S1D1,CGLFRCFURX,1,2026) 0.2572505015401749 0\n",
+                 "0 RateOfActivity(REGION,S1D1,CGLFRCFURX,1,2027) 0.06757558148965725 0\n",
+                 "0 RateOfActivity(REGION,S1D1,CGLFRCFURX,1,2028) 0.0558936625751148 0\n",
+                 "0 RateOfActivity(REGION,S1D1,CGLFRCFURX,1,2029) 0.04330608461292407 0\n"]
+            )
+        ]
 
-        expected = [
-                    "0 AnnualFixedOperatingCost(REGION,CDBACKSTOP,2017) 137958.8400384134 0\n",
-                    "0 AnnualFixedOperatingCost(REGION,CDBACKSTOP,2018) 305945.3841061913 0\n",
-                    "0 AnnualFixedOperatingCost(REGION,CDBACKSTOP,2019) 626159.9611543404 0\n"]
+    @mark.parametrize("cplex_input,expected", test_data)
+    def test_convert_from_cplex_to_cbc(self, cplex_input, expected):
 
-        actual = process_line(fixture, 2015, 2070)
-        assert actual == expected
-
-
-    def test_rate_of_activity(self):
-
-        fixture = """RateOfActivity	REGION	S1D1	CGLFRCFURX	1	0.0	0.0	0.0	0.0	0.0	0.3284446367303371	0.3451714779880536	0.3366163200621617	0.3394945166233896	0.3137488154250392	0.28605725055560716	0.2572505015401749	0.06757558148965725	0.0558936625751148	0.04330608461292407	0.0	0.0	0.0	0.0	0.0	0.0	0.0	0.0	0.0	0.0	0.0	0.0	0.0	0.0	0.0	0.0	0.0	0.0	0.0	0.0	0.0	0.0	0.0	0.0	0.0	0.0	0.0	0.0	0.0	0.0	0.0	0.0	0.0	0.0	0.0	0.0	0.0	0.0	0.0	0.0	0.0"""
-
-        expected = [
-            "0 RateOfActivity(REGION,S1D1,CGLFRCFURX,1,2020) 0.3284446367303371 0\n",
-            "0 RateOfActivity(REGION,S1D1,CGLFRCFURX,1,2021) 0.3451714779880536 0\n",
-            "0 RateOfActivity(REGION,S1D1,CGLFRCFURX,1,2022) 0.3366163200621617 0\n",
-            "0 RateOfActivity(REGION,S1D1,CGLFRCFURX,1,2023) 0.3394945166233896 0\n",
-            "0 RateOfActivity(REGION,S1D1,CGLFRCFURX,1,2024) 0.3137488154250392 0\n",
-            "0 RateOfActivity(REGION,S1D1,CGLFRCFURX,1,2025) 0.28605725055560716 0\n",
-            "0 RateOfActivity(REGION,S1D1,CGLFRCFURX,1,2026) 0.2572505015401749 0\n",
-            "0 RateOfActivity(REGION,S1D1,CGLFRCFURX,1,2027) 0.06757558148965725 0\n",
-            "0 RateOfActivity(REGION,S1D1,CGLFRCFURX,1,2028) 0.0558936625751148 0\n",
-            "0 RateOfActivity(REGION,S1D1,CGLFRCFURX,1,2029) 0.04330608461292407 0\n"]
-
-        actual = process_line(fixture, 2015, 2070)
+        actual = process_line(cplex_input, 2015, 2070, 'cbc')
         assert actual == expected
 
 
 if __name__ == '__main__':
+    parser = argparse.ArgumentParser(
+        description="Convert OSeMOSYS output files into different formats")
+    parser.add_argument("cplex_file",
+        help="The filepath of the OSeMOSYS cplex output file")
+    parser.add_argument("output_file",
+        help="The filepath of the converted file that will be written")
+    parser.add_argument("-s", "--start_year", type=int, default=2015)
+    parser.add_argument("-e", "--end_year", type=int, default=2070)
+    group = parser.add_mutually_exclusive_group()
+    group.add_argument("--csv", action="store_true")
+    group.add_argument("--cbc", action="store_true")
 
-    if len(sys.argv) != 3:
-        msg = "Usage:\npython {} <cplex_file> <output_file>\n"
-        print(msg.format(sys.argv[0]))
-        sys.exit(1)
+    args = parser.parse_args()
 
-    cplex_file = sys.argv[1]
-    cbc_file = sys.argv[2]
+    if args.csv:
+        output_format = 'csv'
+    elif args.cbc:
+        output_format = 'cbc'
+    else:
+        output_format = 'cbc'
 
-    convert_cplex_file(cplex_file, cbc_file)
+    convert_cplex_file(args.cplex_file, args.output_file,
+                       args.start_year, args.end_year,
+                       output_format)
