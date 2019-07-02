@@ -35,7 +35,7 @@ class ConvertLine(object):
         for index, value in enumerate(values):
 
             year = 2015 + index
-            if (value not in ["0.0", "0", ""]) and (year <= 2050):
+            if (value not in ["0.0", "0", ""]) and (year <= 2070):
 
                 try:
                     value = float(value)
@@ -44,7 +44,7 @@ class ConvertLine(object):
 
                 full_dims = ",".join(dimensions + (str(year),))
 
-                formatted_data = "0\t{0}({1})\t{2}\t0\n".format(
+                formatted_data = "0 {0}({1}) {2} 0\n".format(
                     variable,
                     full_dims,
                     value
