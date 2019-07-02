@@ -55,7 +55,7 @@ class RegionTimeSliceTechnologyMode(ConvertLine):
 
                 year = 2015 + index
 
-                formatted_data = "{0}({1},{2},{3},{4},{5}){6}{7:.2f}{8}0\n".format(
+                formatted_data = "0 {0}({1},{2},{3},{4},{5}){6}{7:.2f}{8}0\n".format(
                     variable,
                     region,
                     timeslice,
@@ -98,7 +98,7 @@ class RegionTechnology(ConvertLine):
                 except ValueError:
                     value = 0
 
-                formatted_data = "{0}({1},{2},{3}){4}{5:.2f}{6}0\n".format(
+                formatted_data = "0 {0}({1},{2},{3}){4}{5:.2f}{6}0\n".format(
                     variable,
                     region,
                     technology,
