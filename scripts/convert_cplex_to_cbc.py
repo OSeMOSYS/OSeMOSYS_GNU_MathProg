@@ -51,7 +51,7 @@ class RegionTimeSliceTechnologyMode(ConvertLine):
 
         for index, value in enumerate(values):
 
-            if float(value) != 0.0:
+            if value not in ["0.0", "0", ""]:
 
                 year = 2015 + index
 
