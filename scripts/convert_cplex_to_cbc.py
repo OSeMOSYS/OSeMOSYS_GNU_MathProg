@@ -147,11 +147,14 @@ def convert_cplex_file(cplex_filename, output_filename):
 
     with open(output_filename, 'w') as cbc_file:
         with open(cplex_filename, 'r') as cplex_file:
-            for line in cplex_file:
+            for linenum, line in enumerate(cplex_file):
                 convertor = process_line(line)
-                if convertor:
-                    data = convertor.convert()
-                    cbc_file.writelines(data)
+                try:
+                    if convertor:
+                        data = convertor.convert()
+                        cbc_file.writelines(data)
+                except ValueError:
+                    raise ValueError("Error caused at line {}".format(linenum))
 
 
 class TestCplexRead:
