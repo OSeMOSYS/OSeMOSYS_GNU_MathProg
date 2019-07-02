@@ -103,9 +103,9 @@ class RegionTechnology(ConvertLine):
                     region,
                     technology,
                     year,
-                    " " * 28,
+                    "\t",
                     value,
-                    " " * 22
+                    "\t"
                     )
 
                 cbc_data.append(formatted_data)
