@@ -89,9 +89,11 @@ class RegionTechnology(ConvertLine):
 
         for index, value in enumerate(values):
 
-            if float(value) != 0.0:
+            if value not in ["0.0", "0", ""]:
 
                 year = 2015 + index
+
+                print(value)
 
                 formatted_data = "{0}({1},{2},{3}){4}{5:.2f}{6}0\n".format(
                     variable,
@@ -159,6 +161,16 @@ def convert_cplex_file(cplex_filename, output_filename):
 
 
 class TestCplexRead:
+
+    def test_different_format(self):
+
+        fixture = "AnnualFixedOperatingCost	REGION	AOBACKSTOP	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0		"
+
+        expected = []
+
+        convertor = process_line(fixture)
+        actual = convertor.convert()
+        assert actual == expected
 
     def test_read_in_line(self):
 
