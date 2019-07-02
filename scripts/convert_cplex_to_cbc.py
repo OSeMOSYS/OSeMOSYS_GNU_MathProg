@@ -2,7 +2,7 @@
 
 """
 import sys
-from typing import List, Union
+from typing import List, Union, Tuple
 
 
 class ConvertLine(object):
@@ -20,10 +20,12 @@ class ConvertLine(object):
     VariableName(REGION,TECHCODE01,2017)       137958.84         0\n
     """
 
-    def __init__(self, data: List):
+    def __init__(self, data: List, start_year: int, end_year: int):
         self.data = data
+        self.start_year = start_year
+        self.end_year = end_year
 
-    def _do_it(self) -> List:
+    def _do_it(self) -> Tuple:
         raise NotImplementedError()
 
     def convert(self) -> List[str]:
@@ -34,8 +36,8 @@ class ConvertLine(object):
 
         for index, value in enumerate(values):
 
-            year = 2015 + index
-            if (value not in ["0.0", "0", ""]) and (year <= 2070):
+            year = self.start_year + index
+            if (value not in ["0.0", "0", ""]) and (year <= self.end_year):
 
                 try:
                     value = float(value)
@@ -57,10 +59,10 @@ class ConvertLine(object):
 
 class RegionTimeSliceTechnologyMode(ConvertLine):
 
-    def _do_it(self) -> List:
+    def _do_it(self) -> Tuple:
         """Produces output indexed by Region, Timeslice, Tech and Mode
 
-        ``VariableName(REGION,SD1D,TECHCODE01,2,2015)       42.69         0\n``
+        ``0 VariableName(REGION,SD1D,TECHCODE01,2,2015) 42.69 0\n``
 
         """
         variable = self.data[0]
@@ -77,10 +79,10 @@ class RegionTimeSliceTechnologyMode(ConvertLine):
 
 class RegionTechnology(ConvertLine):
 
-    def _do_it(self) -> List:
+    def _do_it(self) -> Tuple:
         """Produces output indexed by dimensions Region and Technology
 
-        ``0\tVariableName(REGION,TECHCODE01,2015)\t42.69\t0\n``
+        ``0 VariableName(REGION,TECHCODE01,2015) 42.69 0\n``
 
         """
         variable = self.data[0]
@@ -94,7 +96,7 @@ class RegionTechnology(ConvertLine):
         return (variable, dimensions, values)
 
 
-def process_line(line: str) -> Union[List, None]:
+def process_line(line: str, start_year, end_year) -> List[str]:
     """Processes an individual line in a CPLEX file
 
     A different ConvertLine implementation is chosen depending upon the
@@ -111,16 +113,16 @@ def process_line(line: str) -> Union[List, None]:
                     'CapitalInvestment',
                     'AnnualFixedOperatingCost',
                     'AnnualVariableOperatingCost']:
-        convertor = RegionTechnology(row_as_list)
+        convertor = RegionTechnology(row_as_list, start_year, end_year).convert()
     elif variable in ['RateOfActivity']:
-        convertor = RegionTimeSliceTechnologyMode(row_as_list)
+        convertor = RegionTimeSliceTechnologyMode(row_as_list, start_year, end_year).convert()
     else:
-        convertor = None
+        convertor = []
 
     return convertor
 
 
-def convert_cplex_file(cplex_filename, output_filename):
+def convert_cplex_file(cplex_filename, output_filename, start_year=2015, end_year=2070):
     """Converts a CPLEX solution file into that of the CBC solution file
 
     Arguments
@@ -137,7 +139,6 @@ def convert_cplex_file(cplex_filename, output_filename):
                 convertor = process_line(line)
                 try:
                     if convertor:
-                        data = convertor.convert()
                         cbc_file.writelines(data)
                 except ValueError:
                     msg = "Error caused at line {}: {}"
@@ -152,8 +153,7 @@ class TestCplexRead:
 
         expected = []
 
-        convertor = process_line(fixture)
-        actual = convertor.convert()
+        actual = process_line(fixture, 2015, 2070)
         assert actual == expected
 
     def test_read_in_line(self):
@@ -165,8 +165,7 @@ class TestCplexRead:
                     "0 AnnualFixedOperatingCost(REGION,CDBACKSTOP,2018) 305945.3841061913 0\n",
                     "0 AnnualFixedOperatingCost(REGION,CDBACKSTOP,2019) 626159.9611543404 0\n"]
 
-        convertor = process_line(fixture)
-        actual = convertor.convert()
+        actual = process_line(fixture, 2015, 2070)
         assert actual == expected
 
 
@@ -186,8 +185,7 @@ class TestCplexRead:
             "0 RateOfActivity(REGION,S1D1,CGLFRCFURX,1,2028) 0.0558936625751148 0\n",
             "0 RateOfActivity(REGION,S1D1,CGLFRCFURX,1,2029) 0.04330608461292407 0\n"]
 
-        convertor = process_line(fixture)
-        actual = convertor.convert()
+        actual = process_line(fixture, 2015, 2070)
         assert actual == expected
 
 
