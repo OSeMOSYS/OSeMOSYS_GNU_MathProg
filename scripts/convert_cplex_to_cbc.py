@@ -154,7 +154,8 @@ def convert_cplex_file(cplex_filename, output_filename):
                         data = convertor.convert()
                         cbc_file.writelines(data)
                 except ValueError:
-                    raise ValueError("Error caused at line {}".format(linenum))
+                    msg = "Error caused at line {}: {}"
+                    raise ValueError(msg.format(linenum, line))
 
 
 class TestCplexRead:
