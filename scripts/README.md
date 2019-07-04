@@ -3,7 +3,7 @@
 A collection of useful scripts for running the GNU MathProg implementation of
 OSeMOSYS
 
-## cplex_batchRun.bat 
+## cplex_batchRun.bat
 
 This batch script is for running multiple runs in Windows using GNU MathProg
 and CPLEX. Place all files together with the batch file, and make sure to change
