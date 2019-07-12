@@ -2,7 +2,7 @@
 # 
 # Open Source energy MOdeling SYStem
 #
-# Modified by Francesco Gardumi, Constantinos Taliotis, Igor Tatarewicz, Adrian Levfert
+# Modified by Francesco Gardumi, Constantinos Taliotis, Igor Tatarewicz, Adrian Lefvert
 # Main changes to previous version OSeMOSYS_2016_08_01
 # Bugs fixed in equations:
 #		- Objective function
