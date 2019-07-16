@@ -1,12 +1,8 @@
-# OSeMOSYS_2019_07_10
+# OSeMOSYS_2017_11_08
 # 
 # Open Source energy MOdeling SYStem
 #
-# Modified by Francesco Gardumi, Constantinos Taliotis, Igor Tatarewicz, Adrian Levfert, Kevin Palmer-Wilson
-# Main changes to previous version OSeMOSYS_2017_11_08
-# Bugs fixed in equations:
-#		- Objective function (removed double counting of CapitalCostStorage)
-#
+# Modified by Francesco Gardumi, Constantinos Taliotis, Igor Tatarewicz, Adrian Levfert
 # Main changes to previous version OSeMOSYS_2016_08_01
 # Bugs fixed in equations:
 #		- Objective function
