@@ -1,15 +1,21 @@
 Change Log 
+
 Model osemosys_short.txt with commit hash 7548c08
+
 Modified by Kevin Palmer-Wilson
 
 Changes with respect to previous version commit hash 14cd8cc:
+
 •	Modified objective function to avoid double counting of CapitalCostStorage: The sum{s in STORAGE} was inside the sum{r in REGION, t in TECHNOLOGY, y in YEAR}. Therefore, the storage costs were multiplied by the number of regions times the number of technologies times the number of years. In the corrected version the accounting for storage costs has been moved outside of the sum{r in REGION, t in TECHNOLOGY, y in YEAR} such that sum{r in REGION, s in STORAGE, y in YEAR} are added separately only once.
 
 Previous equation
+
 minimize cost: sum{r in REGION, t in TECHNOLOGY, y in YEAR} (((((sum{yy in YEAR: y-yy < OperationalLife[r,t] && y-yy>=0} NewCapacity[r,t,yy])+ ResidualCapacity[r,t,y])*FixedCost[r,t,y] + sum{m in MODE_OF_OPERATION, l in TIMESLICE} RateOfActivity[r,l,t,m,y]*YearSplit[l,y]*VariableCost[r,t,m,y])/((1+DiscountRate[r])^(y-min{yy in YEAR} min(yy)+0.5))+CapitalCost[r,t,y] * NewCapacity[r,t,y]/((1+DiscountRate[r])^(y-min{yy in YEAR} min(yy)))+DiscountedTechnologyEmissionsPenalty[r,t,y]-DiscountedSalvageValue[r,t,y]) + sum{s in STORAGE} (CapitalCostStorage[r,s,y] * NewStorageCapacity[r,s,y]/((1+DiscountRate[r])^(y-min{yy in YEAR} min(yy)))-SalvageValueStorage[r,s,y]/((1+DiscountRate[r])^(max{yy in YEAR} max(yy)-min{yy in YEAR} min(yy)+1))));
 
 New equation
+
 minimize cost: sum{r in REGION, t in TECHNOLOGY, y in YEAR}(((((sum{yy in YEAR: y-yy < OperationalLife[r,t] && y-yy>=0}NewCapacity[r,t,yy])+ResidualCapacity[r,t,y])*FixedCost[r,t,y]+sum{m in MODE_OF_OPERATION, l in TIMESLICE}RateOfActivity[r,l,t,m,y]*YearSplit[l,y]*VariableCost[r,t,m,y])/((1+DiscountRate[r])^(y-min{yy in YEAR} min(yy)+0.5))+CapitalCost[r,t,y] * NewCapacity[r,t,y]/((1+DiscountRate[r])^(y-min{yy in YEAR} min(yy)))+DiscountedTechnologyEmissionsPenalty[r,t,y]-DiscountedSalvageValue[r,t,y]))+sum{r in REGION, s in STORAGE, y in YEAR}(CapitalCostStorage[r,s,y] * NewStorageCapacity[r,s,y]/((1+DiscountRate[r])^(y-min{yy in YEAR} min(yy)))-SalvageValueStorage[r,s,y]/((1+DiscountRate[r])^(max{yy in YEAR} max(yy)-min{yy in YEAR} min(yy)+1)));
+
 
 
 1.	Model 2017_11_08 and Model 2017_11_08_short
