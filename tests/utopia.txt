@@ -440,7 +440,9 @@ param	TotalTechnologyAnnualActivityLowerLimit	default	0	:=	;
 #
 # TotalTechnologyModelPeriodActivityUpperLimit{r in Region, t in Technology} Units: PJ
 # Maximum level of activity by a technology over the whole model period.
-param	TotalTechnologyModelPeriodActivityUpperLimit	default	99999	:=	;																			
+param	TotalTechnologyModelPeriodActivityUpperLimit	default	99999	:=	
+UTOPIA E51 0   # set E51 to zero to force model not to use it.
+;																			
 #
 # TotalTechnologyModelPeriodActivityLowerLimit{r in Region, t in Technology} Units: PJ
 # Minimum level of activity by a technology over the whole model period.
