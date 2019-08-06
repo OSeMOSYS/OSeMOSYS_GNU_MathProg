@@ -10,3 +10,33 @@ and run the model within this integrated development environment (IDE).
 To do so, open the datafile (e.g. `atlantis.txt`) and 
 select "Use External .dat file" from the Options menu.
 Then change to the model file and select the "Go" icon or press F5.
+
+## Developers - Testing
+
+This repository uses Travis CI to run regression tests and
+harmonisation tests across each of the OSeMOSYS GNU MathProg normal and short
+implementations.
+
+Each push to a branch on the repository, or submission of a pull
+request triggers a build on Travis CI, with the corresponding status reported
+back in the pull request comments.
+
+The tests must pass before a pull request may be merged into the main
+repository.
+
+Tests are defined using the Python package ``pytest`` and the runs are
+configured within the Travis CI configuration file ``.travis.yml``.
+
+The tests are stored in the ``tests`` folder.
+
+### Running the tests
+
+To run the tests on your local computer, you need a Python 3.7 installation.
+The easiest way to install this is using 
+[miniconda](https://docs.conda.io/en/latest/miniconda.html).
+
+Then you need to install pytest `conda install pytest` and can then run the tests
+using the command `pytest`.
+
+Each of the tests in the `tests` folder runs an OSeMOSYS model file and checks that
+the output matches a given value.
