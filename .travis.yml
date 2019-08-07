@@ -4,10 +4,9 @@ python:
 - 3.7
 
 before_install:
-  - sudo apt-get install glpk-utils libglpk-dev
+  - sudo apt-get install -y glpk-utils libglpk-dev coinor-cbc
 install:
   - pip install pytest
-  - apt-get coinor-cbc
 
 script:
   - pytest tests
