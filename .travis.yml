@@ -7,7 +7,7 @@ before_install:
   - sudo apt-get install glpk-utils libglpk-dev
 install:
   - pip install pytest
-  - apt get coinor-cbc
+  - apt-get coinor-cbc
 
 script:
   - pytest tests
