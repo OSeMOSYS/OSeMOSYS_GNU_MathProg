@@ -66,7 +66,12 @@ Pre-processing consists of the following steps:
 4. Values from the `TechnologyToStorage` and `TechnologyFromStorage` sections are added to the sets `MODExTECHNOLOGYperSTORAGEto` and `MODExTECHNOLOGYperSTORAGEfrom` respectively.
 5. All values for technology-mode combinations are added to the sets `MODEperTECHNOLOGY`.
 
-In order to start a model run with a pre-processed data file, the following sets need to be introduced to its associated OSeMOSYS model file:
+This pre-processing can be run on a terminal window with the following command:
+```
+python preprocess_data.py <input_data_file.txt> <preprocessed_data_file.txt>
+``` 
+
+In order to start a model run with a pre-processed data file, the following sets need to be included in the associated OSeMOSYS model file:
 ```
 set MODEperTECHNOLOGY{TECHNOLOGY} within MODE_OF_OPERATION;
 set MODExTECHNOLOGYperFUELout{COMMODITY} within MODE_OF_OPERATION cross TECHNOLOGY;
