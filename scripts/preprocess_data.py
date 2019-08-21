@@ -9,12 +9,12 @@ data_outfile = sys.argv[2]
 lines = []
 with open(data_infile, 'r') as f1:
     for line in f1:
-        if not line.startswith(('set MODEper','set MODEx')):
+        if not line.startswith(('set MODEper','set MODEx', 'end;')):
             lines.append(line)
             
 with open(data_outfile, 'w') as f2:
     f2.writelines(lines)
-    
+
 parsing = False
 
 data_all = []
@@ -37,8 +37,34 @@ with open(data_infile, 'r') as f:
             storage_list = line.split(' ')[3:-1]
         if line.startswith('set MODE_OF_OPERATION'):
             mode_list = line.split(' ')[3:-1]
+        if line.startswith(";"):
+                parsing = False   
+        if parsing:
+            if line.startswith('['):
+                fuel = line.split(',')[2]
+                tech = line.split(',')[1]
+            elif line.startswith(start_year):
+                years = line.rstrip().split(' ')[0:]
+                years = [i.strip(':=') for i in years]
+            elif not line.startswith(start_year):
+                values = line.rstrip().split(' ')[1:]
+                mode = line.split(' ')[0]
+                if param_current=='OutputActivityRatio':    
+                    data_out.append(tuple([fuel,tech,mode]))
+                    for i in range(0,len(years)):
+                        output_table.append(tuple([tech,fuel,mode,years[i],values[i]]))
+                
+                if param_current=='InputActivityRatio':
+                    data_inp.append(tuple([fuel,tech,mode]))   
+                data_all.append(tuple([tech,mode]))
+                
+        if line.startswith(('param OutputActivityRatio','param InputActivityRatio')):
+            param_current = line.split(' ')[1]
+            parsing = True
+        
+        
 
-with open(data_infile, 'r') as f:
+""" with open(data_infile, 'r') as f:
     for line in f:
         if line.startswith(";"):
             parsing = False   
@@ -56,7 +82,7 @@ with open(data_infile, 'r') as f:
                 data_all.append(tuple([tech,mode]))
                 for i in range(0,len(years)):
                     output_table.append(tuple([tech,fuel,mode,years[i],values[i]]))
-        if line.startswith('param OutputActivityRatio'):
+        if line.startswith('param OutputActivityRatio',):
             parsing = True
 
 with open(data_infile, 'r') as f:
@@ -72,7 +98,7 @@ with open(data_infile, 'r') as f:
                 data_inp.append(tuple([fuel,tech,mode]))
                 data_all.append(tuple([tech,mode]))
         if line.startswith('param InputActivityRatio'):
-            parsing = True
+            parsing = True """
 
 # For TechnologyToStorage and TechnologyFromStorage 
 storage_to = []
@@ -92,10 +118,12 @@ with open(data_infile) as f:
                     if values[i] != '0':
                         storage_to.append(tuple([storage,tech,mode_list[i]]))
                         #data_all.append(tuple([tech,mode_list[i]]))
-        if line.startswith('param TechnologyToStorage'):
+        if line.startswith(('param TechnologyToStorage','param TechnologyFromStorage')):
+            param_current = line
+            print(param_current.split(' ')[1])
             parsing = True
 
-with open(data_infile) as f:
+""" with open(data_infile) as f:
     for line in f:
         if line.startswith(";"):
             parsing = False   
@@ -111,42 +139,47 @@ with open(data_infile) as f:
                         #data_all.append(tuple([tech,mode_list[i]]))
         if line.startswith('param TechnologyFromStorage'):
             parsing = True
-            
+"""
+
 dict_out = defaultdict(list)
 dict_inp = defaultdict(list)
 dict_all = defaultdict(list)
 dict_stt = defaultdict(list)
 dict_stf = defaultdict(list)
 
-for f,t,m in data_out:
-    dict_out[f].append((m,t))
+for fuel,tech,mode in data_out:
+    dict_out[fuel].append((mode,tech))
 
-for f,t,m in data_inp:
-    dict_inp[f].append((m,t))
+for fuel,tech,mode in data_inp:
+    dict_inp[fuel].append((mode,tech))
     
-for t,m in data_all:
-    if m not in dict_all[t]:
-        dict_all[t].append(m)
+for tech,mode in data_all:
+    if mode not in dict_all[tech]:
+        dict_all[tech].append(mode)
         
-for s,t,m in storage_to:
-    dict_stt[s].append((m,t))
+for storage,tech,mode in storage_to:
+    dict_stt[storage].append((mode,tech))
 
-for s,t,m in storage_from:
-    dict_stf[s].append((m,t))
-        
+for storage,tech,mode in storage_from:
+    dict_stf[storage].append((mode,tech))
+'''        
 # Open data file and delete line with 'end;' statement
 lines = []
 with open(data_infile, 'r') as f1:
     for line in f1:
         if not line.startswith('end;'):
             lines.append(line)
-            
+
+
 with open(data_outfile, 'w') as f2:
     f2.writelines(lines)
+'''
 
 # Append lines at the end of the data file
-with open(data_outfile, 'a') as file_out: # 'a' to open in 'append' mode
+with open(data_outfile, 'w') as file_out: # 'a' to open in 'append' mode
     
+    file_out.writelines(lines)
+
     for each in fuel_list:
         if each in dict_out.keys():
             line = 'set MODExTECHNOLOGYperFUELout[' + str(each)+']:=' + str(dict_out[each])
