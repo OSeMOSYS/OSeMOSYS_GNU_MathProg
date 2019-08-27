@@ -78,7 +78,7 @@ def main(data_infile, data_outfile):
                     fuel = line.split(',')[2]
                     tech = line.split(',')[1]
                 elif line.startswith(start_year):
-                    years = line.rstrip().split(' ')[0:]
+                    years = line.rstrip(':= ;\n').split(' ')[0:]
                     years = [i.strip(':=') for i in years]
                 else:
                     values = line.rstrip().split(' ')[1:]
