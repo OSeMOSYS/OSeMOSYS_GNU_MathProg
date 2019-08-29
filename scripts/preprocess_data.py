@@ -158,6 +158,12 @@ def main(data_infile, data_outfile):
         file_out.write('end;')
 
 if __name__ == '__main__':
-    data_infile = sys.argv[1]
-    data_outfile = sys.argv[2]
-    main(data_infile, data_outfile)
+
+    if len(sys.argv) != 3:
+        msg = "Usage: python {} <infile> <outfile>"
+        print(msg.format(sys.argv[0]))
+        sys.exit(1)
+    else:
+        data_infile = sys.argv[1]
+        data_outfile = sys.argv[2]
+        main(data_infile, data_outfile)
