@@ -55,3 +55,30 @@ optional arguments:
   --csv                 Output file in comma-separated-values format
   --cbc                 Output file in CBC format, (default option)
 ```
+
+## preprocess_data.py
+
+This script pre-processes an OSeMOSYS input data file by adding lines that list commodity-technology-mode combinations that data is provided for. Pre-processing a data file before starting a model run significantly reduces the time taken for matrix generation. 
+
+Pre-processing consists of the following steps:
+1. Reading the `InputActivityRatio` and `OutputActivityRatio` sections of the data file to identify commodity-technology-mode combinations that data has been explicitly provided for.
+2. Adding a set entry for each commodity that lists all technology-mode combinations that are associated with it.  
+3. Values from the `InputActivityRatios` and `OutputActivityRatios` sections are added to the sets `MODExTECHNOLOGYperFUELin` and `MODExTECHNOLOGYperFUELout` respectively.
+4. Values from the `TechnologyToStorage` and `TechnologyFromStorage` sections are added to the sets `MODExTECHNOLOGYperSTORAGEto` and `MODExTECHNOLOGYperSTORAGEfrom` respectively.
+5. All values for technology-mode combinations are added to the sets `MODEperTECHNOLOGY`.
+
+This pre-processing can be run on a terminal window with the following command:
+```
+python preprocess_data.py <input_data_file.txt> <preprocessed_data_file.txt>
+``` 
+
+In order to start a model run with a pre-processed data file, the following sets need to be included in the associated OSeMOSYS model file:
+```
+set MODEperTECHNOLOGY{TECHNOLOGY} within MODE_OF_OPERATION;
+set MODExTECHNOLOGYperFUELout{COMMODITY} within MODE_OF_OPERATION cross TECHNOLOGY;
+set MODExTECHNOLOGYperFUELin{COMMODITY} within MODE_OF_OPERATION cross TECHNOLOGY;
+set MODExTECHNOLOGYperSTORAGEto{STORAGE} within MODE_OF_OPERATION cross TECHNOLOGY;
+set MODExTECHNOLOGYperSTORAGEfrom{STORAGE} within MODE_OF_OPERATION cross TECHNOLOGY;
+```
+
+
