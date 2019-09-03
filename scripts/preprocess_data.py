@@ -86,27 +86,31 @@ def main(data_infile, data_outfile):
                     
                     if param_current=='OutputActivityRatio':    
                         data_out.append(tuple([fuel,tech,mode]))
+                        data_all.append(tuple([tech,mode]))
                         for i in range(0,len(years)):
                             output_table.append(tuple([tech,fuel,mode,years[i],values[i]]))
                     
                     if param_current=='InputActivityRatio':
                         data_inp.append(tuple([fuel,tech,mode]))   
+                        data_all.append(tuple([tech,mode]))
                     
-                    data_all.append(tuple([tech,mode]))
-
-                    if param_current == 'param TechnologyToStorage' or param_current == 'param TechnologyToStorage':
+                    if param_current == 'TechnologyToStorage' or param_current == 'TechnologyFromStorage':
                         if not line.startswith(mode_list[0]):
                             storage = line.split(' ')[0]
                             values = line.rstrip().split(' ')[1:]
                             for i in range(0,len(mode_list)):
                                 if values[i] != '0':
-                                    storage_to.append(tuple([storage,tech,mode_list[i]]))
+                                    if param_current == 'TechnologyToStorage':
+                                        storage_to.append(tuple([storage,tech,mode_list[i]]))
+                                        data_all.append(tuple([tech,mode_list[i]]))
+                                    if param_current == 'TechnologyFromStorage':
+                                        storage_from.append(tuple([storage,tech,mode_list[i]]))
+                                        data_all.append(tuple([tech,mode_list[i]]))
                     
             if line.startswith(('param OutputActivityRatio','param InputActivityRatio','param TechnologyToStorage','param TechnologyFromStorage')):
                 param_current = line.split(' ')[1]
                 parsing = True
             
-
     dict_out = defaultdict(list)
     dict_inp = defaultdict(list)
     dict_all = defaultdict(list)
@@ -129,7 +133,6 @@ def main(data_infile, data_outfile):
     for storage,tech,mode in storage_from:
         dict_stf[storage].append((mode,tech))
 
-
     def file_output_function(if_dict, str_dict, set_list, set_name, extra_char):
         for each in set_list:
             if each in if_dict.keys():
@@ -151,9 +154,9 @@ def main(data_infile, data_outfile):
         file_output_function(dict_inp, dict_inp, fuel_list, 'set MODExTECHNOLOGYperFUELin[', '')
         file_output_function(dict_all, dict_all, tech_list, 'set MODEperTECHNOLOGY[', '*')
         
-        if len(storage_list) > 1:
-            file_output_function(dict_stt, dict_out, storage_list, 'set MODExTECHNOLOGYperSTORAGEto[', '')
-            file_output_function(dict_stf, dict_out, storage_list, 'set MODExTECHNOLOGYperSTORAGEfrom[', '*')
+        if '' not in storage_list:
+            file_output_function(dict_stt, dict_stt, storage_list, 'set MODExTECHNOLOGYperSTORAGEto[', '')
+            file_output_function(dict_stf, dict_stf, storage_list, 'set MODExTECHNOLOGYperSTORAGEfrom[', '')
             
         file_out.write('end;')
 
