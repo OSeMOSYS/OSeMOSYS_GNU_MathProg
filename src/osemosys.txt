@@ -251,15 +251,38 @@ minimize cost: sum{r in REGION, y in YEAR} TotalDiscountedCost[r,y];
 # Constraints       #
 #####################
 #
-s.t. EQ_SpecifiedDemand{r in REGION, l in TIMESLICE, f in FUEL, y in YEAR}: SpecifiedAnnualDemand[r,f,y]*SpecifiedDemandProfile[r,f,l,y] / YearSplit[l,y]=RateOfDemand[r,l,f,y];
+s.t. EQ_SpecifiedDemand{r in REGION, l in TIMESLICE, f in FUEL, y in YEAR}:
+	SpecifiedAnnualDemand[r,f,y] * SpecifiedDemandProfile[r,f,l,y] / YearSplit[l,y]
+	=
+	RateOfDemand[r,l,f,y];
 #
 #########       	Capacity Adequacy A	     	#############
 #
-s.t. CAa1_TotalNewCapacity{r in REGION, t in TECHNOLOGY, y in YEAR}:AccumulatedNewCapacity[r,t,y] = sum{yy in YEAR: y-yy < OperationalLife[r,t] && y-yy>=0} NewCapacity[r,t,yy];
-s.t. CAa2_TotalAnnualCapacity{r in REGION, t in TECHNOLOGY, y in YEAR}: AccumulatedNewCapacity[r,t,y]+ ResidualCapacity[r,t,y] = TotalCapacityAnnual[r,t,y];
-s.t. CAa3_TotalActivityOfEachTechnology{r in REGION, t in TECHNOLOGY, l in TIMESLICE, y in YEAR}: sum{m in MODE_OF_OPERATION} RateOfActivity[r,l,t,m,y] = RateOfTotalActivity[r,t,l,y];
-s.t. CAa4_Constraint_Capacity{r in REGION, l in TIMESLICE, t in TECHNOLOGY, y in YEAR}: RateOfTotalActivity[r,t,l,y] <= TotalCapacityAnnual[r,t,y] * CapacityFactor[r,t,l,y]*CapacityToActivityUnit[r,t];
-s.t. CAa5_TotalNewCapacity{r in REGION, t in TECHNOLOGY, y in YEAR: CapacityOfOneTechnologyUnit[r,t,y]<>0}: CapacityOfOneTechnologyUnit[r,t,y]*NumberOfNewTechnologyUnits[r,t,y] = NewCapacity[r,t,y];
+s.t. CAa1_TotalNewCapacity{r in REGION, t in TECHNOLOGY, y in YEAR}:
+	AccumulatedNewCapacity[r,t,y]
+	=
+	sum{yy in YEAR: y-yy < OperationalLife[r,t] && y - yy >= 0} NewCapacity[r,t,yy];
+
+s.t. CAa2_TotalAnnualCapacity{r in REGION, t in TECHNOLOGY, y in YEAR}:
+	AccumulatedNewCapacity[r,t,y] + ResidualCapacity[r,t,y]
+	=
+	TotalCapacityAnnual[r,t,y];
+
+s.t. CAa3_TotalActivityOfEachTechnology{r in REGION, t in TECHNOLOGY, l in TIMESLICE, y in YEAR}:
+	sum{m in MODE_OF_OPERATION} RateOfActivity[r,l,t,m,y]
+	=
+	RateOfTotalActivity[r,t,l,y];
+
+s.t. CAa4_Constraint_Capacity{r in REGION, l in TIMESLICE, t in TECHNOLOGY, y in YEAR}:
+	RateOfTotalActivity[r,t,l,y]
+	<=
+	TotalCapacityAnnual[r,t,y] * CapacityFactor[r,t,l,y] * CapacityToActivityUnit[r,t];
+
+s.t. CAa5_TotalNewCapacity{r in REGION, t in TECHNOLOGY, y in YEAR: CapacityOfOneTechnologyUnit[r,t,y]<>0}:
+	CapacityOfOneTechnologyUnit[r,t,y] * NumberOfNewTechnologyUnits[r,t,y]
+	=
+	NewCapacity[r,t,y];
+
 #
 # Note that the PlannedMaintenance equation below ensures that all other technologies have a capacity great enough
 # to at least meet the annual average.
@@ -276,7 +299,8 @@ s.t. CAb1_PlannedMaintenance{r in REGION, t in TECHNOLOGY, y in YEAR: Availabili
 #########	        Energy Balance A    	 	#############
 #
 s.t. EBa1_RateOfFuelProduction1{
-	r in REGION, l in TIMESLICE, f in FUEL, t in TECHNOLOGY, m in MODE_OF_OPERATION, y in YEAR: OutputActivityRatio[r,t,f,m,y] <> 0}:
+	r in REGION, l in TIMESLICE, f in FUEL, t in TECHNOLOGY, m in MODE_OF_OPERATION, y in YEAR:
+	OutputActivityRatio[r,t,f,m,y] <> 0}:
 	RateOfActivity[r,l,t,m,y] * OutputActivityRatio[r,t,f,m,y]
 	=
 	RateOfProductionByTechnologyByMode[r,l,t,m,f,y];
@@ -382,13 +406,13 @@ s.t. Acc4_ModelPeriodCostByRegion{r in REGION}:
 #########        	Storage Equations			#############
 #
 s.t. S1_RateOfStorageCharge{r in REGION, s in STORAGE, ls in SEASON, ld in DAYTYPE, lh in DAILYTIMEBRACKET, y in YEAR}:
-	sum{t in TECHNOLOGY, m in MODE_OF_OPERATION, l in TIMESLICE: TechnologyToStorage[r,t,s,m]>0}
+	sum{t in TECHNOLOGY, m in MODE_OF_OPERATION, l in TIMESLICE: TechnologyToStorage[r,t,s,m] > 0}
 	RateOfActivity[r,l,t,m,y] * TechnologyToStorage[r,t,s,m] * Conversionls[l,ls] * Conversionld[l,ld] * Conversionlh[l,lh]
 	=
 	RateOfStorageCharge[r,s,ls,ld,lh,y];
 
 s.t. S2_RateOfStorageDischarge{r in REGION, s in STORAGE, ls in SEASON, ld in DAYTYPE, lh in DAILYTIMEBRACKET, y in YEAR}:
-	sum{t in TECHNOLOGY, m in MODE_OF_OPERATION, l in TIMESLICE:TechnologyFromStorage[r,t,s,m] > 0}
+	sum{t in TECHNOLOGY, m in MODE_OF_OPERATION, l in TIMESLICE: TechnologyFromStorage[r,t,s,m] > 0}
 	RateOfActivity[r,l,t,m,y] * TechnologyFromStorage[r,t,s,m] * Conversionls[l,ls] * Conversionld[l,ld] * Conversionlh[l,lh]
 	=
 	RateOfStorageDischarge[r,s,ls,ld,lh,y];
