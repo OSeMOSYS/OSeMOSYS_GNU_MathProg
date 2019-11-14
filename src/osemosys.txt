@@ -251,7 +251,8 @@ minimize cost: sum{r in REGION, y in YEAR} TotalDiscountedCost[r,y];
 # Constraints       #
 #####################
 #
-s.t. EQ_SpecifiedDemand{r in REGION, l in TIMESLICE, f in FUEL, y in YEAR}:
+s.t. EQ_SpecifiedDemand{r in REGION, l in TIMESLICE, f in FUEL, y in YEAR:
+						SpecifiedAnnualDemand[r,f,y] <> 0}:
 	SpecifiedAnnualDemand[r,f,y] * SpecifiedDemandProfile[r,f,l,y] / YearSplit[l,y]
 	=
 	RateOfDemand[r,l,f,y];
@@ -344,12 +345,13 @@ s.t. EBa7_EnergyBalanceEachTS1{r in REGION, l in TIMESLICE, f in FUEL, y in YEAR
 	Production[r,l,f,y];
 
 s.t. EBa8_EnergyBalanceEachTS2{r in REGION, l in TIMESLICE, f in FUEL, y in YEAR:
-							    (sum{t in TECHNOLOGY, m in MODE_OF_OPERATION} InputActivityRatio[r,t,f,m,y]) <> 0}:
+							   (sum{t in TECHNOLOGY, m in MODE_OF_OPERATION} InputActivityRatio[r,t,f,m,y]) <> 0}:
 	RateOfUse[r,l,f,y] * YearSplit[l,y]
 	=
 	Use[r,l,f,y];
 
-s.t. EBa9_EnergyBalanceEachTS3{r in REGION, l in TIMESLICE, f in FUEL, y in YEAR}:
+s.t. EBa9_EnergyBalanceEachTS3{r in REGION, l in TIMESLICE, f in FUEL, y in YEAR:
+							   SpecifiedAnnualDemand[r,f,y] <> 0}:
 	RateOfDemand[r,l,f,y] * YearSplit[l,y]
 	=
 	Demand[r,l,f,y];
