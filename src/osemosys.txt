@@ -266,7 +266,7 @@ s.t. CAa5_TotalNewCapacity{r in REGION, t in TECHNOLOGY, y in YEAR: CapacityOfOn
 #
 #########       	Capacity Adequacy B		 	#############
 #
-s.t. CAb1_PlannedMaintenance{r in REGION, t in TECHNOLOGY, y in YEAR}:
+s.t. CAb1_PlannedMaintenance{r in REGION, t in TECHNOLOGY, y in YEAR: AvailabilityFactor[r,t,y] < 1}:
 	sum{l in TIMESLICE} RateOfTotalActivity[r,t,l,y] * YearSplit[l,y]
 	<=
 	sum{l in TIMESLICE} (TotalCapacityAnnual[r,t,y] * CapacityFactor[r,t,l,y] * YearSplit[l,y])
