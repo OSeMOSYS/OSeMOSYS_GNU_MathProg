@@ -579,7 +579,7 @@ s.t. E2_AnnualEmissionProduction{r in REGION, t in TECHNOLOGY, e in EMISSION, y 
 	=
 	AnnualTechnologyEmission[r,t,e,y];
 
-s.t. E3_EmissionsPenaltyByTechAndEmission{r in REGION, t in TECHNOLOGY, e in EMISSION, y in YEAR}:
+s.t. E3_EmissionsPenaltyByTechAndEmission{r in REGION, t in TECHNOLOGY, e in EMISSION, y in YEAR: EmissionsPenalty[r,e,y] <> 0}:
 	AnnualTechnologyEmission[r,t,e,y] * EmissionsPenalty[r,e,y]
 	=
 	AnnualTechnologyEmissionPenaltyByEmission[r,t,e,y];
