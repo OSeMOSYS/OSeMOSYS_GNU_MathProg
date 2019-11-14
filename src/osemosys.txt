@@ -488,10 +488,27 @@ s.t. SV4_SalvageValueDiscountedToStartYear{r in REGION, t in TECHNOLOGY, y in YE
 #
 #########        	Operating Costs 		 	#############
 #
-s.t. OC1_OperatingCostsVariable{r in REGION, t in TECHNOLOGY, l in TIMESLICE, y in YEAR}: sum{m in MODE_OF_OPERATION} TotalAnnualTechnologyActivityByMode[r,t,m,y]*VariableCost[r,t,m,y] = AnnualVariableOperatingCost[r,t,y];
-s.t. OC2_OperatingCostsFixedAnnual{r in REGION, t in TECHNOLOGY, y in YEAR}: TotalCapacityAnnual[r,t,y]*FixedCost[r,t,y] = AnnualFixedOperatingCost[r,t,y];
-s.t. OC3_OperatingCostsTotalAnnual{r in REGION, t in TECHNOLOGY, y in YEAR}: AnnualFixedOperatingCost[r,t,y]+AnnualVariableOperatingCost[r,t,y] = OperatingCost[r,t,y];
-s.t. OC4_DiscountedOperatingCostsTotalAnnual{r in REGION, t in TECHNOLOGY, y in YEAR}: OperatingCost[r,t,y]/((1+DiscountRate[r])^(y-min{yy in YEAR} min(yy)+0.5)) = DiscountedOperatingCost[r,t,y];
+s.t. OC1_OperatingCostsVariable{r in REGION, t in TECHNOLOGY, l in TIMESLICE, y in YEAR}:
+	sum{m in MODE_OF_OPERATION}
+	TotalAnnualTechnologyActivityByMode[r,t,m,y] * VariableCost[r,t,m,y]
+	=
+	AnnualVariableOperatingCost[r,t,y];
+
+s.t. OC2_OperatingCostsFixedAnnual{r in REGION, t in TECHNOLOGY, y in YEAR}:
+	TotalCapacityAnnual[r,t,y]*FixedCost[r,t,y]
+	=
+	AnnualFixedOperatingCost[r,t,y];
+
+s.t. OC3_OperatingCostsTotalAnnual{r in REGION, t in TECHNOLOGY, y in YEAR}:
+	AnnualFixedOperatingCost[r,t,y] + AnnualVariableOperatingCost[r,t,y]
+	=
+	OperatingCost[r,t,y];
+
+s.t. OC4_DiscountedOperatingCostsTotalAnnual{r in REGION, t in TECHNOLOGY, y in YEAR}:
+	OperatingCost[r,t,y] / ((1+DiscountRate[r])^(y-min{yy in YEAR} min(yy) + 0.5))
+	=
+	DiscountedOperatingCost[r,t,y];
+
 #
 #########       	Total Discounted Costs	 	#############
 #
