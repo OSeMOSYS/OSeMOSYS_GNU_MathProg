@@ -567,7 +567,8 @@ s.t. RE5_FuelUseByTechnologyAnnual{r in REGION, t in TECHNOLOGY, f in FUEL, y in
 #
 #########   		Emissions Accounting		##############
 #
-s.t. E1_AnnualEmissionProductionByMode{r in REGION, t in TECHNOLOGY, e in EMISSION, m in MODE_OF_OPERATION, y in YEAR}:
+s.t. E1_AnnualEmissionProductionByMode{r in REGION, t in TECHNOLOGY, e in EMISSION, m in MODE_OF_OPERATION, y in YEAR:
+									   EmissionActivityRatio[r,t,e,m,y] <> 0}:
 	EmissionActivityRatio[r,t,e,m,y] * TotalAnnualTechnologyActivityByMode[r,t,m,y]
 	=
 	AnnualTechnologyEmissionByMode[r,t,e,m,y];
