@@ -98,7 +98,7 @@ param FixedCost{r in REGION, t in TECHNOLOGY, y in YEAR};
 #
 param TechnologyToStorage{r in REGION, t in TECHNOLOGY, s in STORAGE, m in MODE_OF_OPERATION};
 param TechnologyFromStorage{r in REGION, t in TECHNOLOGY, s in STORAGE, m in MODE_OF_OPERATION};
-param StorageLevelStart{r in REGION, s in STORAGE};
+# param StorageLevelStart{r in REGION, s in STORAGE};
 param StorageMaxChargeRate{r in REGION, s in STORAGE};
 param StorageMaxDischargeRate{r in REGION, s in STORAGE};
 param MinStorageCharge{r in REGION, s in STORAGE, y in YEAR};
