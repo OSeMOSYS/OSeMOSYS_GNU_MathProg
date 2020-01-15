@@ -16,9 +16,9 @@
 #
 #****************************************																																
 param	AnnualExogenousEmission			default	0		:=	;																												
-param	AnnualEmissionLimit				default	9999	:=	;
+param	AnnualEmissionLimit				default	-1	:=	;
 param	ModelPeriodExogenousEmission	default	0		:=	;																												
-param	ModelPeriodEmissionLimit		default	9999	:=	;
+param	ModelPeriodEmissionLimit		default	-1	:=	;
 #****************************************																							
 set	EMISSION			:=	CO2	NOX	;																			
 set	TECHNOLOGY			:=	E01	E21	E31	E51	E70	IMPDSL1	IMPGSL1	IMPHCO1	IMPOIL1	IMPURN1	RHE	RHO	RL1	SRE	TXD	TXE	TXG	RIV	RHu RLu TXu	;	
@@ -405,7 +405,7 @@ UTOPIA									40	40	100	100	40	30	30	10	50	15	15	15	;
 #
 # TotalAnnualMaxCapacity{r in Region, t in Technology, y in Year} Units: GW
 # Maximum total (residual and new) capacity each year.
-param	TotalAnnualMaxCapacity	default	99999	:=																				
+param	TotalAnnualMaxCapacity	default	-1	:=																				
 	[UTOPIA,*,*]	:	1990		1991		1992		1993		1994		1995		1996		1997		1998		1999		2000		2001		2002		2003		2004		2005		2006		2007		2008		2009		2010		:=
 E31						0.1301		0.1401		0.1401		0.1501		0.1501		0.1501		0.1601		0.1601		0.1601		0.1601		0.1701		0.201		0.201		0.201		0.201		0.201		0.201		0.201		0.201		0.201		0.2101	
 E51						3			3			3			3			3			3			3			3			3			3			3			3			3			3			3			3			3			3			3			3			3	
@@ -424,7 +424,7 @@ SRE						0.1		0.1		0.1		0.1		0.1		0.1		0.1		0.1		0.1		0.1		0		0		0		0		0		0		0		
 #
 # TotalAnnualMaxCapacityInvestment{r in Region, t in Technology, y in Year} Units: GW
 # Maximum new capacity each year.  Use this to stop OSeMOSYS investing in existing technologies.
-param	TotalAnnualMaxCapacityInvestment	default	99999	:=	;																			
+param	TotalAnnualMaxCapacityInvestment	default	-1	:=	;																			
 #	
 # TotalAnnualMinCapacityInvestment{r in Region, t in Technology, y in Year} Units: GW
 # Minimum new capacity each year.
@@ -432,7 +432,7 @@ param	TotalAnnualMinCapacityInvestment	default	0	:=	;
 #
 # param TotalTechnologyAnnualActivityUpperLimit{r in Region, t in Technology, y in Year} Units: PJ
 # Maximum amount of activity that a technology can perform each year.
-param	TotalTechnologyAnnualActivityUpperLimit	default	99999	:=	;																			
+param	TotalTechnologyAnnualActivityUpperLimit	default	-1	:=	;																			
 #
 # TotalTechnologyAnnualActivityLowerLimit{r in Region, t in Technology, y in Year} Units: PJ
 # Minimum activity that a technology can perform each year.
@@ -440,7 +440,7 @@ param	TotalTechnologyAnnualActivityLowerLimit	default	0	:=	;
 #
 # TotalTechnologyModelPeriodActivityUpperLimit{r in Region, t in Technology} Units: PJ
 # Maximum level of activity by a technology over the whole model period.
-param	TotalTechnologyModelPeriodActivityUpperLimit	default	99999	:=	
+param	TotalTechnologyModelPeriodActivityUpperLimit	default	-1	:=	
 UTOPIA E51 0   # set E51 to zero to force model not to use it.
 ;																			
 #
