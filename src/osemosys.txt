@@ -373,24 +373,24 @@ s.t. TDC2_TotalDiscountedCost{r in REGION, y in YEAR}: sum{t in TECHNOLOGY} Tota
 #
 #########      		Total Capacity Constraints 	##############
 #
-s.t. TCC1_TotalAnnualMaxCapacityConstraint{r in REGION, t in TECHNOLOGY, y in YEAR}: TotalCapacityAnnual[r,t,y] <= TotalAnnualMaxCapacity[r,t,y];
+s.t. TCC1_TotalAnnualMaxCapacityConstraint{r in REGION, t in TECHNOLOGY, y in YEAR: TotalAnnualMaxCapacity[r,t,y] <> -1}: TotalCapacityAnnual[r,t,y] <= TotalAnnualMaxCapacity[r,t,y];
 s.t. TCC2_TotalAnnualMinCapacityConstraint{r in REGION, t in TECHNOLOGY, y in YEAR: TotalAnnualMinCapacity[r,t,y]>0}: TotalCapacityAnnual[r,t,y] >= TotalAnnualMinCapacity[r,t,y];
 #
 #########    		New Capacity Constraints  	##############
 #
-s.t. NCC1_TotalAnnualMaxNewCapacityConstraint{r in REGION, t in TECHNOLOGY, y in YEAR}: NewCapacity[r,t,y] <= TotalAnnualMaxCapacityInvestment[r,t,y];
+s.t. NCC1_TotalAnnualMaxNewCapacityConstraint{r in REGION, t in TECHNOLOGY, y in YEAR: TotalAnnualMaxCapacityInvestment[r,t,y] <> -1}: NewCapacity[r,t,y] <= TotalAnnualMaxCapacityInvestment[r,t,y];
 s.t. NCC2_TotalAnnualMinNewCapacityConstraint{r in REGION, t in TECHNOLOGY, y in YEAR: TotalAnnualMinCapacityInvestment[r,t,y]>0}: NewCapacity[r,t,y] >= TotalAnnualMinCapacityInvestment[r,t,y];
 #
 #########   		Annual Activity Constraints	##############
 #
 s.t. AAC1_TotalAnnualTechnologyActivity{r in REGION, t in TECHNOLOGY, y in YEAR}: sum{l in TIMESLICE} RateOfTotalActivity[r,t,l,y]*YearSplit[l,y] = TotalTechnologyAnnualActivity[r,t,y];
-s.t. AAC2_TotalAnnualTechnologyActivityUpperLimit{r in REGION, t in TECHNOLOGY, y in YEAR}: TotalTechnologyAnnualActivity[r,t,y] <= TotalTechnologyAnnualActivityUpperLimit[r,t,y] ;
+s.t. AAC2_TotalAnnualTechnologyActivityUpperLimit{r in REGION, t in TECHNOLOGY, y in YEAR: TotalTechnologyAnnualActivityUpperLimit[r,t,y] <> -1}: TotalTechnologyAnnualActivity[r,t,y] <= TotalTechnologyAnnualActivityUpperLimit[r,t,y] ;
 s.t. AAC3_TotalAnnualTechnologyActivityLowerLimit{r in REGION, t in TECHNOLOGY, y in YEAR: TotalTechnologyAnnualActivityLowerLimit[r,t,y]>0}: TotalTechnologyAnnualActivity[r,t,y] >= TotalTechnologyAnnualActivityLowerLimit[r,t,y] ;
 #
 #########    		Total Activity Constraints 	##############
 #
 s.t. TAC1_TotalModelHorizonTechnologyActivity{r in REGION, t in TECHNOLOGY}: sum{y in YEAR} TotalTechnologyAnnualActivity[r,t,y] = TotalTechnologyModelPeriodActivity[r,t];
-s.t. TAC2_TotalModelHorizonTechnologyActivityUpperLimit{r in REGION, t in TECHNOLOGY: TotalTechnologyModelPeriodActivityUpperLimit[r,t]>0}: TotalTechnologyModelPeriodActivity[r,t] <= TotalTechnologyModelPeriodActivityUpperLimit[r,t] ;
+s.t. TAC2_TotalModelHorizonTechnologyActivityUpperLimit{r in REGION, t in TECHNOLOGY: TotalTechnologyModelPeriodActivityUpperLimit[r,t]<>-1}: TotalTechnologyModelPeriodActivity[r,t] <= TotalTechnologyModelPeriodActivityUpperLimit[r,t] ;
 s.t. TAC3_TotalModelHorizenTechnologyActivityLowerLimit{r in REGION, t in TECHNOLOGY: TotalTechnologyModelPeriodActivityLowerLimit[r,t]>0}: TotalTechnologyModelPeriodActivity[r,t] >= TotalTechnologyModelPeriodActivityLowerLimit[r,t] ;
 #
 #########   		Reserve Margin Constraint	############## NTS: Should change demand for production
@@ -416,8 +416,8 @@ s.t. E4_EmissionsPenaltyByTechnology{r in REGION, t in TECHNOLOGY, y in YEAR}: s
 s.t. E5_DiscountedEmissionsPenaltyByTechnology{r in REGION, t in TECHNOLOGY, y in YEAR}: AnnualTechnologyEmissionsPenalty[r,t,y]/((1+DiscountRate[r])^(y-min{yy in YEAR} min(yy)+0.5)) = DiscountedTechnologyEmissionsPenalty[r,t,y];
 s.t. E6_EmissionsAccounting1{r in REGION, e in EMISSION, y in YEAR}: sum{t in TECHNOLOGY} AnnualTechnologyEmission[r,t,e,y] = AnnualEmissions[r,e,y];
 s.t. E7_EmissionsAccounting2{r in REGION, e in EMISSION}: sum{y in YEAR} AnnualEmissions[r,e,y] = ModelPeriodEmissions[r,e]- ModelPeriodExogenousEmission[r,e];
-s.t. E8_AnnualEmissionsLimit{r in REGION, e in EMISSION, y in YEAR}: AnnualEmissions[r,e,y]+AnnualExogenousEmission[r,e,y] <= AnnualEmissionLimit[r,e,y];
-s.t. E9_ModelPeriodEmissionsLimit{r in REGION, e in EMISSION}: ModelPeriodEmissions[r,e] <= ModelPeriodEmissionLimit[r,e] ;
+s.t. E8_AnnualEmissionsLimit{r in REGION, e in EMISSION, y in YEAR: AnnualEmissionLimit[r, e, y] <> -1}: AnnualEmissions[r,e,y]+AnnualExogenousEmission[r,e,y] <= AnnualEmissionLimit[r,e,y];
+s.t. E9_ModelPeriodEmissionsLimit{r in REGION, e in EMISSION: ModelPeriodEmissionLimit[r, e] <> -1}: ModelPeriodEmissions[r,e] <= ModelPeriodEmissionLimit[r,e] ;
 #
 ###########################################################################################
 #
