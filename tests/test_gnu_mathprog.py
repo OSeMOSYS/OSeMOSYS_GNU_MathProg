@@ -47,7 +47,7 @@ def check_results(path, variable):
     """
     value = None
 
-    header = ["No.", "Row name", "St", "Activity", 
+    header = ["No.", "Row name", "St", "Activity",
               "Lower bound", "Upper bound", "Marginal"]
 
     with open(path, 'r') as results_file:
@@ -64,12 +64,12 @@ class TestNormalWithCBC():
 
     @fixture(scope='function')
     def run_model_cbc(self, model_file, data_file, lp_folder, results_folder):
-        arguments = ['glpsol', '-m', model_file, '-d', 
+        arguments = ['glpsol', '-m', model_file, '-d',
                      data_file, '--wlp', lp_folder, '--check']
         run(arguments)
-        arguments = ['cbc', lp_folder, 'solve', '-solu', results_folder]
-        output = run(arguments)      
-        return output, results_folder   
+        arguments = ['cbc', lp_folder, '-sec', '15', 'solve', '-solu', results_folder]
+        output = run(arguments)
+        return output, results_folder
 
     def test_run_model_with_cbc(self, run_model_cbc):
         _, results_folder = run_model_cbc
@@ -82,7 +82,7 @@ class TestNormal():
 
     @fixture(scope='function')
     def run_model(self, model_file, data_file, results_folder):
-        arguments = ['glpsol', '-m', model_file, '-d', 
+        arguments = ['glpsol', '-m', model_file, '-d',
                      data_file, '-o', results_folder]
         output = run(arguments, capture_output=True, text=True)
         return output, results_folder
@@ -109,7 +109,7 @@ class TestShort():
 
     def test_mathprog_run_short(self, short_model_file, data_file, results_folder):
 
-        arguments = ['glpsol', '-m', short_model_file, '-d', 
+        arguments = ['glpsol', '-m', short_model_file, '-d',
                      data_file, '-o', results_folder]
         output = run(arguments, capture_output=True, text=True)
         assert 'OPTIMAL LP SOLUTION FOUND' in output.stdout
