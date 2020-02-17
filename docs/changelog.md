@@ -1,5 +1,22 @@
 # OSeMOSYS Change Log
 
+## Conditional operators added to 5 parameters
+
+Pull request #30 @tniet, @willu47
+
+Conditional operators were added to five parameters in both short and long versions of the code:
+
+- TotalAnnualMaxCapacity
+- TotalAnnualMaxCapacityInvestment
+- TotalTechnologyAnnualActivityUpperLimit
+- AnnualEmissionLimit
+- ModelPeriodEmissionLimit
+- TotalTechnologyModelPeriodActivityUpperLimit
+
+If the default value in the corresponding data file is set of `-1`, then the constraints will no longer be generated,
+resulting in a significant improvement in the size of the problem created, and avoiding issues where some constraints
+were ignored.
+
 ## Model osemosys_short.txt with commit hash 7548c08
 
 Modified by Kevin Palmer-Wilson
