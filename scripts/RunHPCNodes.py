@@ -17,7 +17,7 @@ if __name__ == '__main__':
     param2List = ['0000', '0050', '0100']
     param1List = ['35', '65', '100']    
 
-    NumRunsTotal = len(param2s)*len(param3Levels)*len(param1s)
+    NumRunsTotal = len(param1List)*len(param2List)*len(param3List)
     
     NumRunstoGroup = 600  # Number of runs to group for each qsub command
     NumberofCores = 32
