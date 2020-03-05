@@ -766,7 +766,11 @@ table AccumulatedNewCapacity
         NewCapacity[r,t,yy] ~VALUE;
 
 table AnnualFixedOperatingCost
-    {r in REGION, t in TECHNOLOGY, y in YEAR}
+    {r in REGION, t in TECHNOLOGY, y in YEAR:
+        ((sum{yy in YEAR: y-yy < OperationalLife[r,t] && y-yy>=0}
+            NewCapacity[r,t,yy]) + ResidualCapacity[r,t,y])
+        > 0 && FixedCost[r,t,y] > 0
+        }
     OUT "CSV"
     "results/AnnualFixedOperatingCost.csv" :
     r~REGION, t~TECHNOLOGY, y~YEAR,
@@ -804,7 +808,7 @@ table AnnualVariableOperatingCostResults
 
 table CapitalInvestmentResults
     {r in REGION, t in TECHNOLOGY, y in YEAR:
-        NewCapacity[r,t,y] > 0}
+        NewCapacity[r,t,y] > 0 && CapitalCost[r,t,y] > 0}
     OUT "CSV"
     "results/CapitalInvestment.csv" :
     r~REGION, t~TECHNOLOGY, y~YEAR,
@@ -985,7 +989,7 @@ table TotalTechnologyModelPeriodActivity
 table TradeResults
     {r in REGION, rr in REGION, l in TIMESLICE, f in FUEL, y in YEAR:
         Trade[r, rr, l, f, y]
-        > 0}
+        <> 0}
     OUT "CSV"
     "results/Trade.csv":
     r~REGION, rr~REGION, l~TIMESLICE, f~FUEL, y~YEAR,
