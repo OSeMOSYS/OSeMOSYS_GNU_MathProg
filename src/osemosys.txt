@@ -419,7 +419,6 @@ s.t. E9_ModelPeriodEmissionsLimit{r in REGION, e in EMISSION: ModelPeriodEmissio
 ###########################################################################################
 #
 # Try to write to ResultsPath BEFORE doing the (computationally expensive) solve
-printf "\n" > ResultsPath & "/SelectedResults.csv";
 
 # Solve the problem
 solve;
@@ -436,7 +435,6 @@ solve;
 #
 ###                Total costs and emissions by region        ###
 #
-printf "\n" > ResultsPath & "/SelectedResults.csv";
 printf "\n" > ResultsPath & "/SelectedResults.csv";
 printf "Summary" >> ResultsPath & "/SelectedResults.csv";
 for {r in REGION}         {printf ",%s", r >> ResultsPath & "/SelectedResults.csv";
@@ -754,7 +752,7 @@ table AnnualEmissionsResults
 		AnnualEmissions[r, e, y] > 0}
 	OUT "CSV"
 	ResultsPath & "/AnnualEmissions.csv" :
-	r~REGION, e~EMISSIONS, y~YEAR, AnnualEmissions[r, e, y]~VALUE;
+	r~REGION, e~EMISSION, y~YEAR, AnnualEmissions[r, e, y]~VALUE;
 
 table tout
 	{r in REGION, t in TECHNOLOGY, y in YEAR:
@@ -768,14 +766,14 @@ table AnnualTechnologyEmissionResults
 		AnnualTechnologyEmission[r, t, e, y] > 0}
 	OUT "CSV"
 	ResultsPath & "/AnnualTechnologyEmission.csv" :
-	r~REGION, t~TECHNOLOGY, e~EMISSIONS, y~YEAR, AnnualTechnologyEmission[r, t, e, y]~VALUE;
+	r~REGION, t~TECHNOLOGY, e~EMISSION, y~YEAR, AnnualTechnologyEmission[r, t, e, y]~VALUE;
 
 table AnnualTechnologyEmissionByModeResults
 	{r in REGION, t in TECHNOLOGY, e in EMISSION, m in MODE_OF_OPERATION, y in YEAR:
 		AnnualTechnologyEmissionByMode[r, t, e, m, y] > 0}
 	OUT "CSV"
 	ResultsPath & "/AnnualTechnologyEmissionByMode.csv" :
-	r~REGION, t~TECHNOLOGY, e~EMISSIONS, m~MODE_OF_OPERATION, y~YEAR, AnnualTechnologyEmissionByMode[r, t, e, m, y]~VALUE;
+	r~REGION, t~TECHNOLOGY, e~EMISSION, m~MODE_OF_OPERATION, y~YEAR, AnnualTechnologyEmissionByMode[r, t, e, m, y]~VALUE;
 
 table AnnualVariableOperatingCostResults
 	{r in REGION, t in TECHNOLOGY, y in YEAR:

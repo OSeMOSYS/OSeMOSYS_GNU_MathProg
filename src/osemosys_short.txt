@@ -426,7 +426,6 @@ s.t. E9_ModelPeriodEmissionsLimit{r in REGION, e in EMISSION: ModelPeriodEmissio
 #
 ###########################################################################################
 # Try to write to ResultsPath BEFORE doing the (computationally expensive) solve
-printf "\n" > ResultsPath & "/SelectedResults.csv";
 
 # Solve the problem
 solve;
@@ -442,6 +441,7 @@ solve;
 ####        Summary results         ###
 #
 ###                Total costs and emissions by region        ###
+printf "\n" > ResultsPath & "/SelectedResults.csv";
 printf "Summary" >> ResultsPath & "/SelectedResults.csv";
 for {r in REGION}         {printf ",%s", r >> ResultsPath & "/SelectedResults.csv";
                                         }
