@@ -74,7 +74,6 @@ param AccumulatedAnnualDemand{r in REGION, f in FUEL, y in YEAR};
 #########			Performance					#############
 #
 param CapacityToActivityUnit{r in REGION, t in TECHNOLOGY};
-param TechWithCapacityNeededToMeetPeakTS{r in REGION, t in TECHNOLOGY};
 param CapacityFactor{r in REGION, t in TECHNOLOGY, l in TIMESLICE, y in YEAR};
 param AvailabilityFactor{r in REGION, t in TECHNOLOGY, y in YEAR};
 param OperationalLife{r in REGION, t in TECHNOLOGY};
@@ -419,6 +418,10 @@ s.t. E9_ModelPeriodEmissionsLimit{r in REGION, e in EMISSION: ModelPeriodEmissio
 #
 ###########################################################################################
 #
+# Try to write to ResultsPath BEFORE doing the (computationally expensive) solve
+printf "\n" > ResultsPath & "/SelectedResults.csv";
+
+# Solve the problem
 solve;
 #
 #########################################################################################################
@@ -433,6 +436,7 @@ solve;
 #
 ###                Total costs and emissions by region        ###
 #
+printf "\n" > ResultsPath & "/SelectedResults.csv";
 printf "\n" > ResultsPath & "/SelectedResults.csv";
 printf "Summary" >> ResultsPath & "/SelectedResults.csv";
 for {r in REGION}         {printf ",%s", r >> ResultsPath & "/SelectedResults.csv";
