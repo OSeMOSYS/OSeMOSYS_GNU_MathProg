@@ -1,91 +1,58 @@
+"""Runs tests against long and short OSeMOSYS implementations and various solvers
+
+Checks::
+
+- OSeMOSYS Short formulation
+- OSeMOSYS Long formulation
+
+and solvers::
+
+- GLPSOL
+- CBC
+
+"""
 import os
 from pytest import fixture
 import pandas as pd
 
+import tempfile
+
 from subprocess import run
 
 
+@fixture()
 def get_folder():
     return os.path.dirname(os.path.abspath(__file__))
 
 
-@fixture(scope="session")
-def model_file():
-    return os.path.join(get_folder(), "../src/osemosys.txt")
+@fixture(
+    scope="function",
+    params=[("glpk", "long"), ("glpk", "short")],
+    ids=["glpk-long", "glpk-short"],
+)
+def run_model(request, tmpdir, get_folder):
 
+    if request.param[1] == "long":
+        model_file = os.path.join(get_folder, "../src/osemosys.txt")
+    elif request.param[1] == "short":
+        model_file = os.path.join(get_folder, "../src/osemosys_short.txt")
 
-@fixture(scope="session")
-def short_model_file():
-    return os.path.join(get_folder(), "../src/osemosys_short.txt")
+    results_folder = str(tmpdir.mkdir("results"))
 
+    os.chdir(os.path.join(results_folder, ".."))
 
-@fixture(scope="session")
-def data_file():
-    return os.path.join(get_folder(), "utopia.txt")
+    data_file = os.path.join(get_folder, "utopia.txt")
 
+    if request.param[0] == "glpk":
 
-@fixture(scope="session")
-def results_folder(tmp_path_factory):
-    path = tmp_path_factory.mktemp("test")
-    os.mkdir(os.path.join(str(path), "results"))
-    return os.path.join(str(path))
+        arguments = ["glpsol", "-m", model_file, "-d", data_file]
+        output = run(arguments, capture_output=True, text=True)
+        return output, os.path.join(results_folder)
 
+    elif request.param[0] == "cbc":
 
-@fixture(scope="session")
-def cbc_results_folder(tmp_path_factory):
-    path = tmp_path_factory.mktemp("test")
-    results = os.path.join(str(path), "results.txt")
-    return results
+        lp_file = tempfile.NamedTemporaryFile(suffix=".lp").name
 
-
-@fixture(scope="session")
-def lp_folder(tmp_path_factory):
-    path = tmp_path_factory.mktemp("model")
-    fn = os.path.join(str(path), "model.lp")
-    return fn
-
-
-def check_results(path, variable):
-    """Extracts a variable name from the GLPK results output
-
-    Arguments
-    ---------
-    path : str
-        File path to the results file
-    variable : str
-        Row name for which to extract information
-
-    Returns
-    -------
-    dict
-        A dictionary with the header names as keys and extracted row values
-    """
-    value = None
-
-    header = [
-        "No.",
-        "Row name",
-        "St",
-        "Activity",
-        "Lower bound",
-        "Upper bound",
-        "Marginal",
-    ]
-
-    with open(path, "r") as results_file:
-        for line in results_file:
-            if variable in line:
-                value = line + next(results_file)
-
-    if value:
-        return dict(zip(header, value.split()))
-    else:
-        raise ValueError("No row found with variable name {}".format(variable))
-
-
-class TestNormalWithCBC:
-    @fixture(scope="function")
-    def run_model_cbc(self, model_file, data_file, lp_folder, cbc_results_folder):
         arguments = [
             "glpsol",
             "-m",
@@ -93,39 +60,33 @@ class TestNormalWithCBC:
             "-d",
             data_file,
             "--wlp",
-            lp_folder,
+            lp_file,
             "--check",
         ]
         run(arguments)
-        arguments = ["cbc", lp_folder, "-sec", "15", "solve", "-solu", cbc_results_folder]
+
+        cbc_results_file = os.path.join(results_folder, "results.txt")
+
+        arguments = ["cbc", lp_file, "-sec", "15", "solve", "-solu", cbc_results_file]
         output = run(arguments)
-        return output, cbc_results_folder
-
-    def test_run_model_with_cbc(self, run_model_cbc):
-        _, results_folder = run_model_cbc
-        assert os.path.exists(results_folder)
-        with open(results_folder, "r") as solution_file:
-            line = next(solution_file)
-            assert "Optimal - objective value 29446.86269434" in line
+        return output, cbc_results_file
 
 
-class TestNormal:
-    @fixture(scope="session")
-    def run_model(self, model_file, data_file, results_folder):
-        arguments = ["glpsol", "-m", model_file, "-d", data_file]
-        os.chdir(os.path.join(results_folder))
-        output = run(arguments, capture_output=True, text=True)
-        return output, os.path.join(results_folder, "results")
-
+class TestOsemosysOutputs:
     def test_mathprog_run_normal(self, run_model):
-
         output, results_folder = run_model
         assert "OPTIMAL LP SOLUTION FOUND" in output.stdout
         assert "obj =   2.944686269e+04" in output.stdout
 
     def test_results_exist(self, run_model):
+        """OSeMOSYS short and long versions should produce 29 CSV files
+
+        These are placed into the folder specified by the ``ResultPath``
+        parameter
+        """
         _, results_folder = run_model
         assert os.path.exists(str(results_folder))
+        assert len(os.listdir(str(results_folder))) == 29
 
     def test_results_read_accumulated_new_capacity(self, run_model):
         """
@@ -184,19 +145,87 @@ class TestNormal:
 
         pd.testing.assert_frame_equal(actual, expected)
 
+    def test_results_read_investment_cost(self, run_model):
+        """
+        """
+        _, results_folder = run_model
 
-class TestShort:
-    def test_mathprog_run_short(self, short_model_file, data_file, results_folder):
+        result_file = os.path.join(str(results_folder), "CapitalInvestment.csv")
+        df = pd.read_csv(result_file)
 
-        arguments = [
-            "glpsol",
-            "-m",
-            short_model_file,
-            "-d",
-            data_file,
-            "-o",
-            results_folder,
-        ]
-        output = run(arguments, capture_output=True, text=True)
-        assert "OPTIMAL LP SOLUTION FOUND" in output.stdout
-        assert "obj =   2.944686269e+04" in output.stdout
+        actual = (
+            df.groupby(by=["REGION", "TECHNOLOGY"], as_index=False)
+            .sum()
+            .drop(columns="YEAR")
+        )
+
+        expected = pd.DataFrame(
+            columns=["REGION", "TECHNOLOGY", "VALUE"],
+            data=[
+                ["UTOPIA", "E01", 2845.536735],
+                ["UTOPIA", "E31", 330.000000],
+                ["UTOPIA", "RHE", 4218.095050],
+                ["UTOPIA", "RHO", 4613.524752],
+                ["UTOPIA", "SRE", 10.000000],
+                ["UTOPIA", "TXD", 18572.760000],
+            ],
+        )
+
+        pd.testing.assert_frame_equal(actual, expected)
+
+    def test_results_read_varom(self, run_model):
+        """
+        """
+        _, results_folder = run_model
+
+        result_file = os.path.join(
+            str(results_folder), "AnnualVariableOperatingCost.csv"
+        )
+        df = pd.read_csv(result_file)
+
+        actual = (
+            df.groupby(by=["REGION", "TECHNOLOGY"], as_index=False)
+            .sum()
+            .drop(columns="YEAR")
+        )
+
+        expected = pd.DataFrame(
+            columns=["REGION", "TECHNOLOGY", "VALUE"],
+            data=[
+                ["UTOPIA", "E01", 90.471708],
+                ["UTOPIA", "E31", 0.000310],
+                ["UTOPIA", "E51", 0.000563],
+                ["UTOPIA", "IMPDSL1", 10618.931276],
+                ["UTOPIA", "IMPHCO1", 1884.827246],
+                ["UTOPIA", "RHE", 0.002048],
+                ["UTOPIA", "RHO", 0.006237],
+                ["UTOPIA", "RIV", 0.000968],
+                ["UTOPIA", "RL1", 0.001841],
+                ["UTOPIA", "TXD", 0.001709],
+            ],
+        )
+
+        pd.testing.assert_frame_equal(
+            actual, expected, check_less_precise=True, check_exact=False
+        )
+
+    def test_results_emissions(self, run_model):
+        """
+        """
+        _, results_folder = run_model
+
+        result_file = os.path.join(str(results_folder), "AnnualEmissions.csv")
+        df = pd.read_csv(result_file)
+
+        actual = (
+            df.groupby(by=["REGION", "EMISSION"], as_index=False)
+            .sum()
+            .drop(columns="YEAR")
+        )
+
+        expected = pd.DataFrame(
+            columns=["REGION", "EMISSION", "VALUE"],
+            data=[["UTOPIA", "CO2", 163.516797], ["UTOPIA", "NOX", 170.895000]],
+        )
+
+        pd.testing.assert_frame_equal(actual, expected)
