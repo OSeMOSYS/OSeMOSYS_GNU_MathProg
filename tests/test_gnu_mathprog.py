@@ -31,6 +31,14 @@ def get_folder():
     ids=["glpk-long", "glpk-short"],
 )
 def run_model(request, tmpdir, get_folder):
+    """This paramterised pytest fixture is used to run the different OSeMOSYS formulations
+
+    Both the short and long versions of the code are run for GLPK
+
+    With the addition of a post-processing script for CBC, it will be possible to include
+    CBC in the same tests.
+
+    """
 
     if request.param[1] == "long":
         model_file = os.path.join(get_folder, "../src/osemosys.txt")
@@ -69,6 +77,7 @@ def run_model(request, tmpdir, get_folder):
 
         arguments = ["cbc", lp_file, "-sec", "15", "solve", "-solu", cbc_results_file]
         output = run(arguments)
+        # Add post-processing for CBC results here
         return output, cbc_results_file
 
 

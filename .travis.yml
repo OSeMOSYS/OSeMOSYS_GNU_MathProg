@@ -6,7 +6,7 @@ python:
 before_install:
   - sudo apt-get install -y glpk-utils libglpk-dev coinor-cbc
 install:
-  - pip install pytest
+  - pip install pytest pandas
 
 script:
   - pytest tests
