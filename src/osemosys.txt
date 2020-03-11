@@ -45,7 +45,6 @@ set REGION;
 set SEASON;
 set DAYTYPE;
 set DAILYTIMEBRACKET;
-set FLEXIBLEDEMANDTYPE;
 set STORAGE;
 #
 #####################
