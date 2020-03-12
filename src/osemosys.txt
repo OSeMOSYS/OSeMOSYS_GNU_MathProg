@@ -753,7 +753,7 @@ table AnnualEmissionsResults
 	ResultsPath & "/AnnualEmissions.csv" :
 	r~REGION, e~EMISSION, y~YEAR, AnnualEmissions[r, e, y]~VALUE;
 
-table tout
+table AnnualFixedOperatingCostResults
 	{r in REGION, t in TECHNOLOGY, y in YEAR:
 		AnnualFixedOperatingCost[r, t, y] > 0}
 	OUT "CSV"
