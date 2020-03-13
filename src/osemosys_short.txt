@@ -792,8 +792,8 @@ table AnnualTechnologyEmissionByModeResults
         sum{l in TIMESLICE: EmissionActivityRatio[r,t,e,m,y]<>0} RateOfActivity[r,l,t,m,y] > 0}
     OUT "CSV"
     ResultsPath & "/AnnualTechnologyEmissionByMode.csv" :
-    r, t, e, m, y,
-    sum{l in TIMESLICE: EmissionActivityRatio[r,t,e,m,y]<>0}
+    r~REGION, t~TECHNOLOGY, e~EMISSION, m~MODE_OF_OPERATION, y~YEAR,
+    sum{l in TIMESLICE: EmissionActivityRatio[r,t,e,m,y] <> 0}
         EmissionActivityRatio[r,t,e,m,y] * RateOfActivity[r,l,t,m,y] * YearSplit[l,y] ~VALUE;
 
 table AnnualVariableOperatingCostResults

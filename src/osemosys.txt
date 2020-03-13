@@ -853,7 +853,7 @@ table ProductionByTechnologyAnnualResults
 	r~REGION, t~TECHNOLOGY, f~FUEL, y~YEAR,
 	ProductionByTechnologyAnnual[r, t, f, y]~VALUE;
 
-table RateOfProductionByTechnologyResults
+table RateOfActivityResults
 	{r in REGION, l in TIMESLICE, t in TECHNOLOGY, m in MODE_OF_OPERATION, y in YEAR:
 		RateOfActivity[r, l, t, m, y] > 0}
 	OUT "CSV"
