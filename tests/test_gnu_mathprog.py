@@ -27,8 +27,8 @@ def get_folder():
 
 @fixture(
     scope="function",
-    params=[("glpk", "long"), ("glpk", "short")],
-    ids=["glpk-long", "glpk-short"],
+    params=[("glpk", "long"), ("glpk", "short"), (("glpk", "fast"))],
+    ids=["glpk-long", "glpk-short", "glpk-fast"],
 )
 def run_model(request, tmpdir, get_folder):
     """This paramterised pytest fixture is used to run the different OSeMOSYS formulations
@@ -44,6 +44,8 @@ def run_model(request, tmpdir, get_folder):
         model_file = os.path.join(get_folder, "../src/osemosys.txt")
     elif request.param[1] == "short":
         model_file = os.path.join(get_folder, "../src/osemosys_short.txt")
+    elif request.param[1] == "fast":
+        model_file = os.path.join(get_folder, "../src/osemosys_fast.txt")
 
     results_folder = str(tmpdir.mkdir("results"))
 

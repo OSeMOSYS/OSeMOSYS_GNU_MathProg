@@ -1,15 +1,7 @@
-# OSeMOSYS_2017_11_08
+# OSeMOSYS SHORT
 #
 # Open Source energy MOdeling SYStem
 #
-# Modified by Francesco Gardumi, Constantinos Taliotis, Igor Tatarewicz, Adrian Levfert
-# Main changes to previous version OSeMOSYS_2016_08_01
-# Bugs fixed in equations:
-#		- Objective function
-#		- E5, E8, E9
-#		- SV1, SV2
-#		- SC2 (both lower and upper)
-#		- RE4
 # ============================================================================
 #
 #    Copyright [2010-2015] [OSeMOSYS Forum steering committee see: www.osemosys.org]
