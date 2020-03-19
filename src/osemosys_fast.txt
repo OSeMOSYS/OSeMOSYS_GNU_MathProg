@@ -2,10 +2,6 @@
 #
 # Open Source energy MOdeling SYStem
 #
-# Main changes to previous version OSeMOSYS_2016_08_01_short
-#       - Parameter REMinProductionTarget no more indicated by user as % of demand for fuel f, but as % of production of fuel f.
-#		- Fixed bugs in storage equations.
-#
 # ============================================================================
 #
 #    Copyright [2010-2015] [OSeMOSYS Forum steering committee see: www.osemosys.org]
@@ -58,6 +54,7 @@ set STORAGE;
 #
 ########                        Global                                                 #############
 #
+param ResultsPath, symbolic default 'results';
 param YearSplit{l in TIMESLICE, y in YEAR};
 param DiscountRate{r in REGION};
 param DaySplit{lh in DAILYTIMEBRACKET, y in YEAR};
@@ -745,7 +742,7 @@ table AnnualEmissions
     OUT "CSV"
     ResultsPath & "/AnnualEmissions.csv" :
     r~REGION, e~EMISSION, y~YEAR,
-    sum{t in TECHNOLOGY, l in TIMESLICE, m in MODE_OF_OPERATION: EmissionActivityRatio[r,t,e,m,y]<>0}
+    sum{t in TECHNOLOGY, l in TIMESLICE, m in MODEperTECHNOLOGY[t]: EmissionActivityRatio[r,t,e,m,y]<>0}
         EmissionActivityRatio[r,t,e,m,y] * RateOfActivity[r,l,t,m,y] * YearSplit[l,y]~VALUE;
 
 table AccumulatedNewCapacity
@@ -792,11 +789,11 @@ table AnnualTechnologyEmissionByModeResults
 
 table AnnualVariableOperatingCostResults
     {r in REGION, t in TECHNOLOGY, y in YEAR:
-        sum{m in MODE_OF_OPERATION, l in TIMESLICE} RateOfActivity[r,l,t,m,y] > 0}
+        sum{m in MODEperTECHNOLOGY[t], l in TIMESLICE} RateOfActivity[r,l,t,m,y] > 0}
     OUT "CSV"
     ResultsPath & "/AnnualVariableOperatingCost.csv" :
     r~REGION, t~TECHNOLOGY, y~YEAR,
-    sum{m in MODE_OF_OPERATION, l in TIMESLICE}
+    sum{m in MODEperTECHNOLOGY[t], l in TIMESLICE}
         RateOfActivity[r,l,t,m,y] * YearSplit[l,y] * VariableCost[r,t,m,y] ~VALUE;
 
 table CapitalInvestmentResults
@@ -861,7 +858,7 @@ table ProductionByTechnology
     OUT "CSV"
     ResultsPath & "/ProductionByTechnology.csv" :
     r~REGION, l~TIMESLICE, t~TECHNOLOGY, f~FUEL, y~YEAR,
-    sum{m in MODE_OF_OPERATION: OutputActivityRatio[r,t,f,m,y] <> 0}
+    sum{m in MODEperTECHNOLOGY[t]: OutputActivityRatio[r,t,f,m,y] <> 0}
         RateOfActivity[r,l,t,m,y] * OutputActivityRatio[r,t,f,m,y] * YearSplit[l,y] ~VALUE;
 
 table ProductionByTechnologyAnnual
@@ -871,11 +868,11 @@ table ProductionByTechnologyAnnual
     OUT "CSV"
     ResultsPath & "/ProductionByTechnologyAnnual.csv" :
     r~REGION, t~TECHNOLOGY, f~FUEL, y~YEAR,
-    sum{l in TIMESLICE, m in MODE_OF_OPERATION: OutputActivityRatio[r,t,f,m,y] <> 0}
+    sum{l in TIMESLICE, m in MODEperTECHNOLOGY[t]: OutputActivityRatio[r,t,f,m,y] <> 0}
         RateOfActivity[r,l,t,m,y] * OutputActivityRatio[r,t,f,m,y] * YearSplit[l,y] ~VALUE;
 
 table RateOfActivityResults
-    {r in REGION, l in TIMESLICE, t in TECHNOLOGY, m in MODE_OF_OPERATION, y in YEAR:
+    {r in REGION, l in TIMESLICE, t in TECHNOLOGY, m in MODEperTECHNOLOGY[t], y in YEAR:
         RateOfActivity[r, l, t, m, y] > 0}
     OUT "CSV"
     ResultsPath & "/RateOfActivity.csv" :
@@ -884,16 +881,16 @@ table RateOfActivityResults
 
 table RateOfProductionByTechnologyResults
     {r in REGION, l in TIMESLICE, t in TECHNOLOGY, f in FUEL, y in YEAR:
-        sum{m in MODE_OF_OPERATION: OutputActivityRatio[r,t,f,m,y] <> 0}
+        sum{m in MODEperTECHNOLOGY[t]: OutputActivityRatio[r,t,f,m,y] <> 0}
             RateOfActivity[r,l,t,m,y] > 0}
     OUT "CSV"
     ResultsPath & "/RateOfProductionByTechnology.csv" :
     r~REGION, l~TIMESLICE, t~TECHNOLOGY, f~FUEL, y~YEAR,
-    sum{m in MODE_OF_OPERATION: OutputActivityRatio[r,t,f,m,y] <> 0}
+    sum{m in MODEperTECHNOLOGY[t]: OutputActivityRatio[r,t,f,m,y] <> 0}
         RateOfActivity[r,l,t,m,y] * OutputActivityRatio[r,t,f,m,y]~VALUE;
 
 table RateOfProductionByTechnologyByMode
-    {r in REGION, l in TIMESLICE, t in TECHNOLOGY, m in MODE_OF_OPERATION, f in FUEL, y in YEAR:
+    {r in REGION, l in TIMESLICE, t in TECHNOLOGY, m in MODEperTECHNOLOGY[t], f in FUEL, y in YEAR:
         RateOfActivity[r,l,t,m,y] > 0 && OutputActivityRatio[r,t,f,m,y] <> 0}
     OUT "CSV"
     ResultsPath & "/RateOfProductionByTechnologyByMode.csv" :
@@ -902,16 +899,16 @@ table RateOfProductionByTechnologyByMode
 
 table RateOfUseByTechnology
     {r in REGION, l in TIMESLICE, t in TECHNOLOGY, f in FUEL, y in YEAR:
-        sum{m in MODE_OF_OPERATION: InputActivityRatio[r,t,f,m,y]<>0}
+        sum{m in MODEperTECHNOLOGY[t]: InputActivityRatio[r,t,f,m,y]<>0}
             RateOfActivity[r,l,t,m,y] > 0}
     OUT "CSV"
     ResultsPath & "/RateOfUseByTechnology.csv":
     r~REGION, l~TIMESLICE, t~TECHNOLOGY, f~FUEL, y~YEAR,
-    sum{m in MODE_OF_OPERATION: InputActivityRatio[r,t,f,m,y]<>0}
+    sum{m in MODEperTECHNOLOGY[t]: InputActivityRatio[r,t,f,m,y]<>0}
         RateOfActivity[r,l,t,m,y] * InputActivityRatio[r,t,f,m,y]~VALUE;
 
 table RateOfUseByTechnologyByMode
-    {r in REGION, l in TIMESLICE, t in TECHNOLOGY, m in MODE_OF_OPERATION, f in FUEL, y in YEAR:
+    {r in REGION, l in TIMESLICE, t in TECHNOLOGY, m in MODEperTECHNOLOGY[t], f in FUEL, y in YEAR:
         RateOfActivity[r,l,t,m,y] && InputActivityRatio[r,t,f,m,y]  <> 0}
     OUT "CSV"
     ResultsPath & "/RateOfUseByTechnologyByMode.csv":
@@ -935,7 +932,7 @@ table SalvageValueStorageResults
     SalvageValueStorage[r, s, y]~VALUE;
 
 table TotalAnnualTechnologyActivityByMode
-    {r in REGION, t in TECHNOLOGY, m in MODE_OF_OPERATION, y in YEAR:
+    {r in REGION, t in TECHNOLOGY, m in MODEperTECHNOLOGY[t], y in YEAR:
         sum{l in TIMESLICE}
             RateOfActivity[r,l,t,m,y] > 0}
     OUT "CSV"
@@ -959,24 +956,24 @@ table TotalCapacityAnnual
 
 table TotalTechnologyAnnualActivity
     {r in REGION, t in TECHNOLOGY, y in YEAR:
-        sum{l in TIMESLICE, m in MODE_OF_OPERATION}
+        sum{l in TIMESLICE, m in MODEperTECHNOLOGY[t]}
             RateOfActivity[r,l,t,m,y]
         > 0}
     OUT "CSV"
     ResultsPath & "/TotalTechnologyAnnualActivity.csv":
     r~REGION, t~TECHNOLOGY, y~YEAR,
-    sum{l in TIMESLICE, m in MODE_OF_OPERATION}
+    sum{l in TIMESLICE, m in MODEperTECHNOLOGY[t]}
         RateOfActivity[r,l,t,m,y] * YearSplit[l,y]~VALUE;
 
 table TotalTechnologyModelPeriodActivity
     {r in REGION, t in TECHNOLOGY:
-        sum{l in TIMESLICE, m in MODE_OF_OPERATION, y in YEAR}
+        sum{l in TIMESLICE, m in MODEperTECHNOLOGY[t], y in YEAR}
             RateOfActivity[r,l,t,m,y]
         > 0}
     OUT "CSV"
     ResultsPath & "/TotalTechnologyModelPeriodActivity.csv":
     r~REGION, t~TECHNOLOGY,
-    sum{l in TIMESLICE, m in MODE_OF_OPERATION, y in YEAR}
+    sum{l in TIMESLICE, m in MODEperTECHNOLOGY[t], y in YEAR}
         RateOfActivity[r,l,t,m,y]*YearSplit[l,y]~VALUE;
 
 table TradeResults
@@ -990,11 +987,13 @@ table TradeResults
 
 table UseByTechnologyResults
     {r in REGION, l in TIMESLICE, t in TECHNOLOGY, f in FUEL, y in YEAR:
-        UseByTechnology[r, l, t, f, y]
+        sum{m in MODEperTECHNOLOGY[t]}
+            RateOfActivity[r,l,t,m,y] * InputActivityRatio[r,t,f,m,y] * YearSplit[l,y]
         > 0}
     OUT "CSV"
     ResultsPath & "/UseByTechnology.csv":
     r~REGION, l~TIMESLICE, t~TECHNOLOGY, f~FUEL, y~YEAR,
-    UseByTechnology[r, l, t, f, y]~VALUE;
+    sum{m in MODEperTECHNOLOGY[t]}
+        RateOfActivity[r,l,t,m,y] * InputActivityRatio[r,t,f,m,y] * YearSplit[l,y]~VALUE;
 
 end;
