@@ -4,11 +4,12 @@ Checks::
 
 - OSeMOSYS Short formulation
 - OSeMOSYS Long formulation
+- OSeMOSYS Fast formulation
 
 and solvers::
 
 - GLPSOL
-- CBC
+- CBC [awaiting release of otoole v0.7]
 
 """
 import os
@@ -33,7 +34,7 @@ def get_folder():
 def run_model(request, tmpdir, get_folder):
     """This paramterised pytest fixture is used to run the different OSeMOSYS formulations
 
-    Both the short and long versions of the code are run for GLPK
+    The short, long and fast versions of the code are run for GLPK
 
     With the addition of a post-processing script for CBC, it will be possible to include
     CBC in the same tests.
@@ -237,6 +238,57 @@ class TestOsemosysOutputs:
         expected = pd.DataFrame(
             columns=["REGION", "EMISSION", "VALUE"],
             data=[["UTOPIA", "CO2", 163.516797], ["UTOPIA", "NOX", 170.895000]],
+        )
+
+        pd.testing.assert_frame_equal(actual, expected)
+
+    def test_total_tech_model_period_activity(self, run_model):
+        """
+        """
+
+        _, results_folder = run_model
+
+        result_file = os.path.join(str(results_folder), "TotalTechnologyModelPeriodActivity.csv")
+        actual = pd.read_csv(result_file)
+
+        columns = ["REGION", "TECHNOLOGY", "VALUE"]
+        data = [
+            ["UTOPIA", "E01", 301.572359341649],
+            ["UTOPIA", "E31", 30.98719154944],
+            ["UTOPIA", "E51", 56.29176],
+            ["UTOPIA", "IMPDSL1", 1061.89312756574],
+            ["UTOPIA", "IMPHCO1", 942.413622942653],
+            ["UTOPIA", "RHE", 204.751310891089],
+            ["UTOPIA", "RHO", 623.698689108911],
+            ["UTOPIA", "RL1", 184.1],
+            ["UTOPIA", "TXD", 170.895],
+            ["UTOPIA", "RIV", 96.834973592],
+            ]
+
+        expected = pd.DataFrame(
+            columns=columns,
+            data=data,
+        )
+
+        pd.testing.assert_frame_equal(actual, expected)
+
+    def test_results_rate_of_production(self, run_model):
+        """REGION,TIMESLICE,TECHNOLOGY,FUEL,YEAR,VALUE
+        """
+        _, results_folder = run_model
+
+        result_file = os.path.join(str(results_folder), "RateOfProductionByTechnology.csv")
+        df = pd.read_csv(result_file)
+
+        actual = (
+            df.groupby(by=["REGION", "TIMESLICE", "TECHNOLOGY", "FUEL"], as_index=False)
+            .sum()
+            .drop(columns="YEAR")
+        )
+
+        expected = pd.DataFrame(
+            columns=["REGION", "TIMESLICE", "TECHNOLOGY", "FUEL", "VALUE"],
+            data=[["UTOPIA", "WS", "TECH", "FUEL", 163.516797]],
         )
 
         pd.testing.assert_frame_equal(actual, expected)
