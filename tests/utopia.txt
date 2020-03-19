@@ -20,7 +20,7 @@ param	AnnualEmissionLimit				default	-1	:=	;
 param	ModelPeriodExogenousEmission	default	0		:=	;
 param	ModelPeriodEmissionLimit		default	-1	:=	;
 #****************************************
-# param ResultsPath := "results";
+param ResultsPath := "results";
 #****************************************
 set	EMISSION			:=	CO2	NOX	;
 set	TECHNOLOGY			:=	E01	E21	E31	E51	E70	IMPDSL1	IMPGSL1	IMPHCO1	IMPOIL1	IMPURN1	RHE	RHO	RL1	SRE	TXD	TXE	TXG	RIV	RHu RLu TXu	;
