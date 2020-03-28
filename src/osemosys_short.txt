@@ -52,7 +52,7 @@ set STORAGE;
 #
 ########                        Global                                                 #############
 #
-param ResultsPath, symbolic;
+param ResultsPath, symbolic default 'results';
 param YearSplit{l in TIMESLICE, y in YEAR};
 param DiscountRate{r in REGION};
 param DaySplit{lh in DAILYTIMEBRACKET, y in YEAR};
@@ -749,15 +749,6 @@ for {r in REGION} {printf ",%s", r >> ResultsPath & "/SelectedResults.csv";
                                                                                         }
                                         }
 
-table AnnualEmissions
-    {r in REGION, e in EMISSION, y in YEAR:
-        sum{t in TECHNOLOGY, l in TIMESLICE, m in MODE_OF_OPERATION: EmissionActivityRatio[r,t,e,m,y]<>0}
-            RateOfActivity[r,l,t,m,y] > 0}
-    OUT "CSV"
-    ResultsPath & "/AnnualEmissions.csv" :
-    r~REGION, e~EMISSION, y~YEAR,
-    sum{t in TECHNOLOGY, l in TIMESLICE, m in MODE_OF_OPERATION: EmissionActivityRatio[r,t,e,m,y]<>0}
-        EmissionActivityRatio[r,t,e,m,y] * RateOfActivity[r,l,t,m,y] * YearSplit[l,y]~VALUE;
 
 table AccumulatedNewCapacity
     {r in REGION, t in TECHNOLOGY, y in YEAR:
@@ -768,6 +759,16 @@ table AccumulatedNewCapacity
     r~REGION, t~TECHNOLOGY, y~YEAR,
     sum{yy in YEAR: y-yy < OperationalLife[r,t] && y-yy>=0}
         NewCapacity[r,t,yy] ~VALUE;
+
+table AnnualEmissions
+    {r in REGION, e in EMISSION, y in YEAR:
+        sum{t in TECHNOLOGY, l in TIMESLICE, m in MODE_OF_OPERATION: EmissionActivityRatio[r,t,e,m,y]<>0}
+            RateOfActivity[r,l,t,m,y] > 0}
+    OUT "CSV"
+    ResultsPath & "/AnnualEmissions.csv" :
+    r~REGION, e~EMISSION, y~YEAR,
+    sum{t in TECHNOLOGY, l in TIMESLICE, m in MODE_OF_OPERATION: EmissionActivityRatio[r,t,e,m,y]<>0}
+        EmissionActivityRatio[r,t,e,m,y] * RateOfActivity[r,l,t,m,y] * YearSplit[l,y]~VALUE;
 
 table AnnualFixedOperatingCost
     {r in REGION, t in TECHNOLOGY, y in YEAR:
@@ -803,7 +804,8 @@ table AnnualTechnologyEmissionByModeResults
 
 table AnnualVariableOperatingCostResults
     {r in REGION, t in TECHNOLOGY, y in YEAR:
-        sum{m in MODE_OF_OPERATION, l in TIMESLICE} RateOfActivity[r,l,t,m,y] > 0}
+        sum{m in MODE_OF_OPERATION, l in TIMESLICE} RateOfActivity[r,l,t,m,y] > 0 &&
+        sum{m in MODE_OF_OPERATION} VariableCost[r,t,m,y] <> 0}
     OUT "CSV"
     ResultsPath & "/AnnualVariableOperatingCost.csv" :
     r~REGION, t~TECHNOLOGY, y~YEAR,
@@ -967,6 +969,24 @@ table TotalCapacityAnnual
     ResidualCapacity[r,t,y] +
     (sum{yy in YEAR: y-yy < OperationalLife[r,t] && y-yy>=0}
         NewCapacity[r,t,yy])~VALUE;
+
+table TotalDiscountedCostResults
+	{r in REGION, y in YEAR}
+	OUT "CSV"
+	ResultsPath & "/TotalDiscountedCost.csv":
+	r~REGION, y~YEAR,
+	sum{t in TECHNOLOGY}
+        ((((sum{yy in YEAR: y-yy < OperationalLife[r,t] && y-yy>=0}
+            NewCapacity[r,t,yy]) + ResidualCapacity[r,t,y]) * FixedCost[r,t,y]
+          + sum{m in MODE_OF_OPERATION, l in TIMESLICE}
+                RateOfActivity[r,l,t,m,y] * YearSplit[l,y] * VariableCost[r,t,m,y]) / ((1 + DiscountRate[r])^(y-min{yy in YEAR} min(yy) + 0.5))
+          + CapitalCost[r,t,y] * NewCapacity[r,t,y] / ((1 + DiscountRate[r])^(y - min{yy in YEAR} min(yy)))
+          + DiscountedTechnologyEmissionsPenalty[r,t,y]
+          - DiscountedSalvageValue[r,t,y])
+          + sum{s in STORAGE}
+                (CapitalCostStorage[r,s,y] * NewStorageCapacity[r,s,y] / ((1 + DiscountRate[r])^(y - min{yy in YEAR} min(yy)))
+                 - CapitalCostStorage[r,s,y] * NewStorageCapacity[r,s,y] / ((1 + DiscountRate[r])^(y - min{yy in YEAR} min(yy)))
+          )~VALUE;
 
 table TotalTechnologyAnnualActivity
     {r in REGION, t in TECHNOLOGY, y in YEAR:

@@ -53,7 +53,7 @@ set STORAGE;
 #
 ########			Global 						#############
 #
-param ResultsPath, symbolic;
+param ResultsPath, symbolic default 'results';
 param YearSplit{l in TIMESLICE, y in YEAR};
 param DiscountRate{r in REGION};
 param DaySplit{lh in DAILYTIMEBRACKET, y in YEAR};
@@ -921,6 +921,13 @@ table TotalCapacityAnnualResults
 	ResultsPath & "/TotalCapacityAnnual.csv" :
 	r~REGION, t~TECHNOLOGY, y~YEAR,
 	TotalCapacityAnnual[r, t, y]~VALUE;
+
+table TotalDiscountedCostResults
+	{r in REGION, y in YEAR: TotalDiscountedCost[r, y] > 0}
+	OUT "CSV"
+	ResultsPath & "/TotalDiscountedCost.csv" :
+	r~REGION, y~YEAR,
+	TotalDiscountedCost[r, y]~VALUE;
 
 table TotalTechnologyAnnualActivityResults
 	{r in REGION, t in TECHNOLOGY, y in YEAR:
