@@ -71,7 +71,7 @@ def main(data_infile, data_outfile):
             if line.startswith('set MODE_OF_OPERATION'):
                 mode_list = line.split(' ')[3:-1]
             if line.startswith('set EMISSION'):
-                emission_table = line.split(' ')[3:-1]
+                emission_list = line.split(' ')[3:-1]
             
             if line.startswith(";"):
                     parsing = False
@@ -107,36 +107,40 @@ def main(data_infile, data_outfile):
                                     storage_to.append(tuple([storage,tech,mode_list[i]]))
                     
                     if param_current == 'EmissionActivityRatio':
-                        print('EAR')
                         emission_table.append(tuple([emission, tech, mode]))
                   
             if line.startswith(('param OutputActivityRatio','param InputActivityRatio','param TechnologyToStorage','param TechnologyFromStorage', 'param EmissionActivityRatio')):
                 param_current = line.split(' ')[1]
                 parsing = True
-         
+
     dict_out = defaultdict(list)
     dict_inp = defaultdict(list)
     dict_all = defaultdict(list)
     dict_stt = defaultdict(list)
     dict_stf = defaultdict(list)
+    dict_emi = defaultdict(list)
 
-    for fuel,tech,mode in data_out:
-        dict_out[fuel].append((mode,tech))
+    for fuel, tech, mode in data_out:
+        dict_out[fuel].append((mode, tech))
 
-    for fuel,tech,mode in data_inp:
-        dict_inp[fuel].append((mode,tech))
+    for fuel, tech, mode in data_inp:
+        dict_inp[fuel].append((mode, tech))
         
-    for tech,mode in data_all:
+    for tech, mode in data_all:
         if mode not in dict_all[tech]:
             dict_all[tech].append(mode)
             
-    for storage,tech,mode in storage_to:
-        dict_stt[storage].append((mode,tech))
+    for storage, tech, mode in storage_to:
+        dict_stt[storage].append((mode, tech))
 
-    for storage,tech,mode in storage_from:
-        dict_stf[storage].append((mode,tech))
+    for storage, tech, mode in storage_from:
+        dict_stf[storage].append((mode, tech))
 
-
+    for emission, tech, mode in emission_table:
+        dict_emi[emission].append((mode, tech))
+    
+    print(dict_emi)
+    
     def file_output_function(if_dict, str_dict, set_list, set_name, extra_char):
         for each in set_list:
             if each in if_dict.keys():
@@ -161,7 +165,10 @@ def main(data_infile, data_outfile):
         if len(storage_list) > 1:
             file_output_function(dict_stt, dict_out, storage_list, 'set MODExTECHNOLOGYperSTORAGEto[', '')
             file_output_function(dict_stf, dict_out, storage_list, 'set MODExTECHNOLOGYperSTORAGEfrom[', '*')
-            
+
+        if len(emission_list) > 1:
+            file_output_function(dict_emi, dict_emi, emission_list, 'set MODExTECHNOLOGYperEMISSION[', '')
+
         file_out.write('end;')
 
 if __name__ == '__main__':
