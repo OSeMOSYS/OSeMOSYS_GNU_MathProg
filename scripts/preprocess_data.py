@@ -34,6 +34,7 @@ import pandas as pd
 import os, sys
 from collections import defaultdict
 
+
 def main(data_infile, data_outfile):
 
     lines = []
@@ -42,7 +43,7 @@ def main(data_infile, data_outfile):
         for line in f1:
             if not line.startswith(('set MODEper','set MODEx', 'end;')):
                 lines.append(line)
-                
+
     with open(data_outfile, 'w') as f2:
         f2.writelines(lines)
 
@@ -72,9 +73,9 @@ def main(data_infile, data_outfile):
                 mode_list = line.split(' ')[3:-1]
             if line.startswith('set EMISSION'):
                 emission_list = line.split(' ')[3:-1]
-            
+
             if line.startswith(";"):
-                    parsing = False
+                parsing = False
 
             if parsing:
                 if line.startswith('['):
@@ -89,14 +90,14 @@ def main(data_infile, data_outfile):
                     mode = line.split(' ')[0]
                     
                     if param_current == 'OutputActivityRatio':    
-                        data_out.append(tuple([fuel,tech,mode]))
-                        for i in range(0,len(years)):
-                            output_table.append(tuple([tech,fuel,mode,years[i],values[i]]))
+                        data_out.append(tuple([fuel, tech, mode]))
+                        for i in range(0, len(years)):
+                            output_table.append(tuple([tech, fuel, mode, years[i], values[i]]))
                     
                     if param_current == 'InputActivityRatio':
-                        data_inp.append(tuple([fuel,tech,mode]))   
+                        data_inp.append(tuple([fuel, tech, mode]))   
                     
-                    data_all.append(tuple([tech,mode]))
+                    data_all.append(tuple([tech, mode]))
 
                     if param_current == 'TechnologyToStorage' or param_current == 'TechnologyFromStorage':
                         if not line.startswith(mode_list[0]):
@@ -104,12 +105,12 @@ def main(data_infile, data_outfile):
                             values = line.rstrip().split(' ')[1:]
                             for i in range(0, len(mode_list)):
                                 if values[i] != '0':
-                                    storage_to.append(tuple([storage,tech,mode_list[i]]))
-                    
+                                    storage_to.append(tuple([storage, tech, mode_list[i]]))
+
                     if param_current == 'EmissionActivityRatio':
                         emission_table.append(tuple([emission, tech, mode]))
-                  
-            if line.startswith(('param OutputActivityRatio','param InputActivityRatio','param TechnologyToStorage','param TechnologyFromStorage', 'param EmissionActivityRatio')):
+
+            if line.startswith(('param OutputActivityRatio', 'param InputActivityRatio', 'param TechnologyToStorage', 'param TechnologyFromStorage', 'param EmissionActivityRatio')):
                 param_current = line.split(' ')[1]
                 parsing = True
 
@@ -125,11 +126,11 @@ def main(data_infile, data_outfile):
 
     for fuel, tech, mode in data_inp:
         dict_inp[fuel].append((mode, tech))
-        
+
     for tech, mode in data_all:
         if mode not in dict_all[tech]:
             dict_all[tech].append(mode)
-            
+
     for storage, tech, mode in storage_to:
         dict_stt[storage].append((mode, tech))
 
@@ -138,9 +139,7 @@ def main(data_infile, data_outfile):
 
     for emission, tech, mode in emission_table:
         dict_emi[emission].append((mode, tech))
-    
-    print(dict_emi)
-    
+
     def file_output_function(if_dict, str_dict, set_list, set_name, extra_char):
         for each in set_list:
             if each in if_dict.keys():
@@ -154,14 +153,14 @@ def main(data_infile, data_outfile):
             file_out.write(line + ';' + '\n')
 
     # Append lines at the end of the data file
-    with open(data_outfile, 'w') as file_out: # 'a' to open in 'append' mode
-        
+    with open(data_outfile, 'w') as file_out:  # 'a' to open in 'append' mode
+
         file_out.writelines(lines)
-        
+
         file_output_function(dict_out, dict_out, fuel_list, 'set MODExTECHNOLOGYperFUELout[', '')
         file_output_function(dict_inp, dict_inp, fuel_list, 'set MODExTECHNOLOGYperFUELin[', '')
         file_output_function(dict_all, dict_all, tech_list, 'set MODEperTECHNOLOGY[', '*')
-        
+
         if len(storage_list) > 1:
             file_output_function(dict_stt, dict_out, storage_list, 'set MODExTECHNOLOGYperSTORAGEto[', '')
             file_output_function(dict_stf, dict_out, storage_list, 'set MODExTECHNOLOGYperSTORAGEfrom[', '*')
@@ -170,6 +169,7 @@ def main(data_infile, data_outfile):
             file_output_function(dict_emi, dict_emi, emission_list, 'set MODExTECHNOLOGYperEMISSION[', '')
 
         file_out.write('end;')
+
 
 if __name__ == '__main__':
 
