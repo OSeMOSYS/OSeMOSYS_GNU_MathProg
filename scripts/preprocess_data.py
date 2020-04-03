@@ -98,7 +98,7 @@ def main(data_infile, data_outfile):
                     
                     data_all.append(tuple([tech,mode]))
 
-                    if param_current == 'param TechnologyToStorage' or param_current == 'param TechnologyFromStorage':
+                    if param_current == 'TechnologyToStorage' or param_current == 'TechnologyFromStorage':
                         if not line.startswith(mode_list[0]):
                             storage = line.split(' ')[0]
                             values = line.rstrip().split(' ')[1:]
@@ -106,7 +106,7 @@ def main(data_infile, data_outfile):
                                 if values[i] != '0':
                                     storage_to.append(tuple([storage,tech,mode_list[i]]))
                     
-                    if param_current == 'param EmissionActivityRatio':
+                    if param_current == 'EmissionActivityRatio':
                         print('EAR')
                         emission_table.append(tuple([emission, tech, mode]))
                   
