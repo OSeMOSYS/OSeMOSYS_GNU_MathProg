@@ -54,14 +54,15 @@ def main(data_infile, data_outfile):
     output_table = []
     storage_to = []
     storage_from = []
+    emission_table = []
 
     with open(data_infile, 'r') as f:
         for line in f:
             if line.startswith('set YEAR'):
                 start_year = line.split(' ')[3]
-            if line.startswith('set COMMODITY'): # Extracts list of COMMODITIES from data file. Some models use FUEL instead. 
+            if line.startswith('set COMMODITY'):  # Extracts list of COMMODITIES from data file. Some models use FUEL instead. 
                 fuel_list = line.split(' ')[3:-1]
-            if line.startswith('set FUEL'): # Extracts list of FUELS from data file. Some models use COMMODITIES instead. 
+            if line.startswith('set FUEL'):  # Extracts list of FUELS from data file. Some models use COMMODITIES instead. 
                 fuel_list = line.split(' ')[3:-1]
             if line.startswith('set TECHNOLOGY'):
                 tech_list = line.split(' ')[3:-1]
@@ -69,14 +70,17 @@ def main(data_infile, data_outfile):
                 storage_list = line.split(' ')[3:-1]
             if line.startswith('set MODE_OF_OPERATION'):
                 mode_list = line.split(' ')[3:-1]
+            if line.startswith('set EMISSION'):
+                emission_table = line.split(' ')[3:-1]
             
             if line.startswith(";"):
-                    parsing = False   
-            
+                    parsing = False
+
             if parsing:
                 if line.startswith('['):
                     fuel = line.split(',')[2]
                     tech = line.split(',')[1]
+                    emission = line.split(',')[2]
                 elif line.startswith(start_year):
                     years = line.rstrip(':= ;\n').split(' ')[0:]
                     years = [i.strip(':=') for i in years]
@@ -84,29 +88,32 @@ def main(data_infile, data_outfile):
                     values = line.rstrip().split(' ')[1:]
                     mode = line.split(' ')[0]
                     
-                    if param_current=='OutputActivityRatio':    
+                    if param_current == 'OutputActivityRatio':    
                         data_out.append(tuple([fuel,tech,mode]))
                         for i in range(0,len(years)):
                             output_table.append(tuple([tech,fuel,mode,years[i],values[i]]))
                     
-                    if param_current=='InputActivityRatio':
+                    if param_current == 'InputActivityRatio':
                         data_inp.append(tuple([fuel,tech,mode]))   
                     
                     data_all.append(tuple([tech,mode]))
 
-                    if param_current == 'param TechnologyToStorage' or param_current == 'param TechnologyToStorage':
+                    if param_current == 'param TechnologyToStorage' or param_current == 'param TechnologyFromStorage':
                         if not line.startswith(mode_list[0]):
                             storage = line.split(' ')[0]
                             values = line.rstrip().split(' ')[1:]
-                            for i in range(0,len(mode_list)):
+                            for i in range(0, len(mode_list)):
                                 if values[i] != '0':
                                     storage_to.append(tuple([storage,tech,mode_list[i]]))
                     
-            if line.startswith(('param OutputActivityRatio','param InputActivityRatio','param TechnologyToStorage','param TechnologyFromStorage')):
+                    if param_current == 'param EmissionActivityRatio':
+                        print('EAR')
+                        emission_table.append(tuple([emission, tech, mode]))
+                  
+            if line.startswith(('param OutputActivityRatio','param InputActivityRatio','param TechnologyToStorage','param TechnologyFromStorage', 'param EmissionActivityRatio')):
                 param_current = line.split(' ')[1]
                 parsing = True
-            
-
+         
     dict_out = defaultdict(list)
     dict_inp = defaultdict(list)
     dict_all = defaultdict(list)
