@@ -320,6 +320,8 @@ s.t. SC1_LowerLimit{r in REGION, s in STORAGE, l in TIMESLICE, y in YEAR}:  MinS
 
 s.t. SC2_UpperLimit{r in REGION, s in STORAGE, l in TIMESLICE, y in YEAR}:  StorageLevelTSStart[r,s,l,y] <= (sum{yy in YEAR: y-yy < OperationalLifeStorage[r,s] && y-yy>=0} NewStorageCapacity[r,s,yy]+ResidualStorageCapacity[r,s,y]);
 
+s.t. SC7_StorageMaxUpperLimit{s in STORAGE, y in YEAR, r in REGION}:  (sum{yy in YEAR: y-yy < OperationalLifeStorage[r,s] && y-yy>=0} NewStorageCapacity[r,s,yy]+ResidualStorageCapacity[r,s,y]) <= StorageMaxCapacity[r, s, y];
+
 #
 #########                Storage Investments                                #############
 #
