@@ -1,0 +1,363 @@
+
+param ResultsPath := "solutions/Tests_LS/test9/fast";
+###############
+#    Sets     #
+###############
+#
+set DAYTYPE := OneWeekDay ;
+set DAILYTIMEBRACKET := Day Night ;
+set EMISSION :=  ;
+set FUEL := Biomass Diesel Electricity Gas Gas_res Gasoline Solar Tra_Bus Tra_Car Tra_land ;
+set REGION := Region ;
+set MODE_OF_OPERATION := 1 ;
+set STORAGE :=  ;
+set SEASON := Season ;
+set YEAR := 2020 2021 2022 2023 2024 2025 ;
+set TECHNOLOGY := BiomassExtraction BiomassPlant Bus car_dsl car_gsl DieselPlant GasExtraction GasGrid GasTurbine imp_dsl Imp_gsl SolarPV Sun tra_bus tra_car ;
+set TIMESLICE := DayDay DayNight ;
+
+
+#####################
+#    Parameters     #
+#####################
+#
+param AccumulatedAnnualDemand default 0 :=
+[Region,*,*]:
+2020 2021 2022 2023 2024 2025:=
+Electricity 1000 1500 2000 2500 3000 3500
+Gas 500 500 500 1000 100 100
+Tra_land 2000 2500 3000 3500 4000 4500
+;
+
+param AnnualEmissionLimit default 99999 :=
+;
+
+param AnnualExogenousEmission default 0 :=
+;
+
+param AvailabilityFactor default 1 :=
+;
+
+param CapacityFactor default 1 :=
+[Region,BiomassPlant,*,*]:
+2020 2021 2022 2023 2024 2025:=
+DayDay 0.5 0.5 0.5 0.5 0.5 0.5
+DayNight 0.5 0.5 0.5 0.5 0.5 0.5
+[Region,DieselPlant,*,*]:
+2020 2021 2022 2023 2024 2025:=
+DayDay 0.2 0.2 0.2 0.2 0.2 0.2
+DayNight 0.2 0.2 0.2 0.2 0.2 0.2
+[Region,GasTurbine,*,*]:
+2020 2021 2022 2023 2024 2025:=
+DayDay 0.5 0.5 0.5 0.5 0.5 0.5
+DayNight 0.5 0.5 0.5 0.5 0.5 0.5
+[Region,SolarPV,*,*]:
+2020 2021 2022 2023 2024 2025:=
+DayDay 0.3 0.3 0.3 0.3 0.3 0.3
+DayNight 0 0 0 0 0 0
+;
+
+param CapacityOfOneTechnologyUnit default 0 :=
+;
+
+param CapacityToActivityUnit default 1 :
+BiomassExtraction BiomassPlant Bus car_dsl car_gsl DieselPlant GasExtraction GasGrid GasTurbine imp_dsl Imp_gsl SolarPV Sun tra_bus tra_car:=
+Region 1 8.76 1 1 1 8.76 1 1 8.76 1 1 8.76 1 1 1
+;
+
+param CapitalCost default 0.0001 :=
+[Region,*,*]:
+2020 2021 2022 2023 2024 2025:=
+BiomassPlant 2000 2000 2000 2000 2000 2000
+Bus 200 200 200 200 200 200
+car_dsl 20 20 20 20 20 20
+car_gsl 15 15 15 15 15 15
+DieselPlant 1000 1000 1000 1000 1000 1000
+GasTurbine 800 800 800 800 800 800
+SolarPV 1000 1000 1000 1000 1000 1000
+;
+
+param CapitalCostStorage default 0 :=
+;
+
+param Conversionld default 0 :
+OneWeekDay:=
+DayDay 1
+DayNight 1
+;
+
+param Conversionlh default 0 :
+Day Night:=
+DayNight 1 1
+;
+
+param Conversionls default 0 :
+Season:=
+DayDay 1
+DayNight 1
+;
+
+param DaySplit default 0.00137 :=
+;
+
+param DaysInDayType default 7 :=
+;
+
+param DepreciationMethod default 1 :=
+;
+
+param DiscountRate default 0.05 :=
+;
+
+param EmissionActivityRatio default 0 :=
+;
+
+param EmissionsPenalty default 0 :=
+;
+
+param FixedCost default 0 :=
+[Region,*,*]:
+2020 2021 2022 2023 2024 2025:=
+BiomassPlant 20 20 20 20 20 20
+DieselPlant 10 10 10 10 10 10
+GasTurbine 10 10 10 10 10 10
+SolarPV 1 1 1 1 1 1
+;
+
+param InputActivityRatio default 0 :=
+[Region,BiomassPlant,Biomass,*,*]:
+2020 2021 2022 2023 2024 2025:=
+1 3 3 3 3 3 3
+[Region,Bus,Diesel,*,*]:
+2020 2021 2022 2023 2024 2025:=
+1 9 9 9 9 9 9
+[Region,car_dsl,Diesel,*,*]:
+2020 2021 2022 2023 2024 2025:=
+1 1 1 1 1 1 1
+[Region,car_gsl,Gasoline,*,*]:
+2020 2021 2022 2023 2024 2025:=
+1 1 1 1 1 1 1
+[Region,DieselPlant,Diesel,*,*]:
+2020 2021 2022 2023 2024 2025:=
+1 2 2 2 2 2 2
+[Region,GasGrid,Gas,*,*]:
+2020 2021 2022 2023 2024 2025:=
+1 1.1 1.1 1.1 1.1 1.1 1.1
+[Region,GasTurbine,Gas,*,*]:
+2020 2021 2022 2023 2024 2025:=
+1 3 3 3 3 3 3
+[Region,SolarPV,Solar,*,*]:
+2020 2021 2022 2023 2024 2025:=
+1 1 1 1 1 1 1
+[Region,tra_bus,Tra_Bus,*,*]:
+2020 2021 2022 2023 2024 2025:=
+1 1 1 1 1 1 1
+[Region,tra_car,Tra_Car,*,*]:
+2020 2021 2022 2023 2024 2025:=
+1 1 1 1 1 1 1
+;
+
+param MinStorageCharge default 0 :=
+;
+
+param ModelPeriodEmissionLimit default 99999 :=
+;
+
+param ModelPeriodExogenousEmission default 0 :=
+;
+
+param OperationalLife default 1 :
+BiomassExtraction BiomassPlant Bus car_dsl car_gsl DieselPlant GasExtraction GasGrid GasTurbine imp_dsl Imp_gsl SolarPV Sun tra_bus tra_car:=
+Region 10 10 10 10 10 10 10 10 10 1 1 10 10 1 1
+;
+
+param OperationalLifeStorage default 1 :=
+;
+
+param OutputActivityRatio default 0 :=
+[Region,BiomassExtraction,Biomass,*,*]:
+2020 2021 2022 2023 2024 2025:=
+1 1 1 1 1 1 1
+[Region,BiomassPlant,Electricity,*,*]:
+2020 2021 2022 2023 2024 2025:=
+1 1 1 1 1 1 1
+[Region,Bus,Tra_Bus,*,*]:
+2020 2021 2022 2023 2024 2025:=
+1 1 1 1 1 1 1
+[Region,car_dsl,Tra_Car,*,*]:
+2020 2021 2022 2023 2024 2025:=
+1 1 1 1 1 1 1
+[Region,car_gsl,Tra_Car,*,*]:
+2020 2021 2022 2023 2024 2025:=
+1 1 1 1 1 1 1
+[Region,DieselPlant,Electricity,*,*]:
+2020 2021 2022 2023 2024 2025:=
+1 1 1 1 1 1 1
+[Region,GasExtraction,Gas,*,*]:
+2020 2021 2022 2023 2024 2025:=
+1 1 1 1 1 1 1
+[Region,GasGrid,Gas_res,*,*]:
+2020 2021 2022 2023 2024 2025:=
+1 1 1 1 1 1 1
+[Region,GasTurbine,Electricity,*,*]:
+2020 2021 2022 2023 2024 2025:=
+1 1 1 1 1 1 1
+[Region,imp_dsl,Diesel,*,*]:
+2020 2021 2022 2023 2024 2025:=
+1 1 1 1 1 1 1
+[Region,Imp_gsl,Gasoline,*,*]:
+2020 2021 2022 2023 2024 2025:=
+1 1 1 1 1 1 1
+[Region,SolarPV,Electricity,*,*]:
+2020 2021 2022 2023 2024 2025:=
+1 1 1 1 1 1 1
+[Region,Sun,Solar,*,*]:
+2020 2021 2022 2023 2024 2025:=
+1 1 1 1 1 1 1
+[Region,tra_bus,Tra_land,*,*]:
+2020 2021 2022 2023 2024 2025:=
+1 10 10 10 10 10 10
+[Region,tra_car,Tra_land,*,*]:
+2020 2021 2022 2023 2024 2025:=
+1 1 1 1 1 1 1
+;
+
+param REMinProductionTarget default 0 :=
+;
+
+param RETagFuel default 0 :=
+;
+
+param RETagTechnology default 0 :=
+;
+
+param ReserveMargin default 0 :=
+;
+
+param ReserveMarginTagFuel default 0 :=
+;
+
+param ReserveMarginTagTechnology default 0 :=
+;
+
+param ResidualCapacity default 0 :=
+[Region,*,*]:
+2020 2021 2022 2023 2024 2025:=
+BiomassPlant 100 100 100 100 50 50
+Bus 100 100 100 100 100 100
+car_dsl 500 500 500 500 500 500
+car_gsl 500 500 500 500 500 500
+DieselPlant 10 10 10 10 10 10
+GasTurbine 300 300 200 200 100 100
+SolarPV 100 100 100 100 50 50
+;
+
+param ResidualStorageCapacity default 0 :=
+;
+
+param SpecifiedAnnualDemand default 0 :=
+[Region,*,*]:
+2020 2021 2022 2023 2024 2025:=
+Electricity 1000 1500 2000 2500 3000 3500
+;
+
+param SpecifiedDemandProfile default 0 :=
+[Region,Electricity,*,*]:
+2020 2021 2022 2023 2024 2025:=
+DayDay 0.6 0.6 0.6 0.6 0.6 0.6
+DayNight 0.4 0.4 0.4 0.4 0.4 0.4
+;
+
+param StorageLevelStart default 0 :=
+;
+
+param StorageMaxChargeRate default 0 :=
+;
+
+param StorageMaxDischargeRate default 0 :=
+;
+
+param TechnologyFromStorage default 0 :=
+;
+
+param TechnologyToStorage default 0 :=
+;
+
+param TotalAnnualMaxCapacity default 99999 :=
+[Region,*,*]:
+2020 2021 2022 2023 2024 2025:=
+car_gsl 99999 99999 99999 99999 99999 2401
+;
+
+param TotalAnnualMaxCapacityInvestment default 99999 :=
+[Region,*,*]:
+2020 2021 2022 2023 2024 2025:=
+BiomassPlant 50 50 50 50 50 50
+Bus 10 10 10 10 10 10
+car_dsl 400 400 400 400 400 400
+car_gsl 400 400 400 400 400 400
+DieselPlant 10 10 10 10 10 10
+GasTurbine 50 50 50 50 50 50
+SolarPV 50 50 50 50 50 50
+;
+
+param TotalAnnualMinCapacity default 0 :=
+;
+
+param TotalAnnualMinCapacityInvestment default 0 :=
+;
+
+param TotalTechnologyAnnualActivityLowerLimit default 0 :=
+;
+
+param TotalTechnologyAnnualActivityUpperLimit default 99999 :=
+[Region,*,*]:
+2020 2021 2022 2023 2024 2025:=
+car_gsl 600 800 1200 1500 2000 2500
+tra_bus 110 110 115 120 125 130
+;
+
+param TotalTechnologyModelPeriodActivityLowerLimit default 0 :=
+;
+
+param TotalTechnologyModelPeriodActivityUpperLimit default 99999 :=
+;
+
+param TradeRoute default 0 :=
+;
+
+param VariableCost default 0.0001 :=
+[Region,BiomassExtraction,*,*]:
+2020 2021 2022 2023 2024 2025:=
+1 1 1 1 1 1 1
+[Region,BiomassPlant,*,*]:
+2020 2021 2022 2023 2024 2025:=
+1 1 1 1 1 1 1
+[Region,DieselPlant,*,*]:
+2020 2021 2022 2023 2024 2025:=
+1 1 1 1 1 1 1
+[Region,GasExtraction,*,*]:
+2020 2021 2022 2023 2024 2025:=
+1 3 3 3 3 3 3
+[Region,GasTurbine,*,*]:
+2020 2021 2022 2023 2024 2025:=
+1 1 1 1 1 1 1
+[Region,imp_dsl,*,*]:
+2020 2021 2022 2023 2024 2025:=
+1 1 1 1 1 1 1
+[Region,Imp_gsl,*,*]:
+2020 2021 2022 2023 2024 2025:=
+1 1.5 1.5 1.5 1.5 1.5 1.5
+[Region,SolarPV,*,*]:
+2020 2021 2022 2023 2024 2025:=
+1 0 0 0 0 0 0
+;
+
+param YearSplit default 0 :
+2020 2021 2022 2023 2024 2025:=
+DayDay 0.5 0.5 0.5 0.5 0.5 0.5
+DayNight 0.5 0.5 0.5 0.5 0.5 0.5
+;
+
+#
+end;
