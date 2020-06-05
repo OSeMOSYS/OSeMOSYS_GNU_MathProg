@@ -1,5 +1,5 @@
 
-param ResultsPath := "solutions/Tests_LS/Pow&GasDemand/fast";
+param ResultsPath := "solutions/Tests_LS/test2/fast";
 ###############
 #    Sets     #
 ###############

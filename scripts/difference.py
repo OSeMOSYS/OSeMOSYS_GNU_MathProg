@@ -11,6 +11,7 @@ def difference(df1, df2):
     diff['err_abs'] = abs(diff['VALUE_x']-diff['VALUE_y'])
     diff['err_rel'] = abs(diff['VALUE_x']-diff['VALUE_y'])/abs(diff['VALUE_x'])
     diff = diff[(diff['err_abs']!=0) & (abs(diff['err_rel'])>0)]
-    try: print('Maximum percentage Difference: '+str(max(abs(diff['err_rel'])))+' Mean Difference: '+str(diff['err_rel'].mean()))
-    except: print('Not possible to calculate Maximum and mean')
-    print(diff)
+    #try: print('Maximum percentage Difference: '+str(max(abs(diff['err_rel'])))+' Mean Difference: '+str(diff['err_rel'].mean()))
+    #except: print('Not possible to calculate Maximum and mean')
+    #print(diff)
+    return diff

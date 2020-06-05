@@ -4,7 +4,7 @@ import os
 import pandas as pd
 
 ### INPUTS
-data_file = 'Tests_LS/test3'                 # name of data file in "inputs" (without extension)
+data_file = 'Tests_LS/test8'                 # name of data file in "inputs" (without extension)
 models = ['long', 'short', 'fast']      # versions of OSeMOSYS to compare
 folder = 'solutions/'+data_file               # location of solutions
 
@@ -14,10 +14,10 @@ for model_file in models:
     run_model(data_file, model_file, destination)
     print('solved '+model_file)
 
-### Check wehther there are differences in the solutions
-ls = 0
-lf = 0
-sf = 0
+### Check whether there are differences in the solutions
+ls = 0  # long vs short
+lf = 0  # long vs fast
+sf = 0  # short vs fast
 
 for file in os.listdir(folder+"/long"):
     filename = os.fsdecode(file)
@@ -28,27 +28,42 @@ for file in os.listdir(folder+"/long"):
 
         if not df_long.equals(df_short):                                            # check if there is any difference
             ls = ls+1
-            print("difference between long and short regarding file: "+filename)
-            difference(df_long,df_short)                                            # function that shows the difference between the CSV files (absolute and relative errors)
-            y = input('continue [y/n]: ')
-            if y == 'n':
-                break
+            #print("difference between long and short regarding file: "+filename)
+            diff = difference(df_long,df_short)                # function that shows the difference between the CSV files (absolute and relative errors)
+            try: 
+                if max(diff['err_rel'])>0.000001:
+                    print("significant difference between long and short regarding file: "+filename)
+                    print(diff)
+            except: print(diff)        
+            #y = input('continue [y/n]: ')
+            #if y == 'n':
+            #    break
         if not df_long.equals(df_fast):
             lf = lf+1
-            print("difference between long and fast regarding file: "+filename)   
-            difference(df_long,df_fast)
-            y = input('continue [y/n]: ')
-            if y == 'n':
-                break
+            #print("difference between long and fast regarding file: "+filename)   
+            diff = difference(df_long,df_fast)
+            try: 
+                if max(diff['err_rel'])>0.000001:
+                    print("significant difference between long and fast regarding file: "+filename)
+                    print(diff)
+            except: print(diff)           
+            #y = input('continue [y/n]: ')
+            #if y == 'n':
+            #    break
         if not df_short.equals(df_fast):
             sf = sf+1
-            print("difference between short and fast regarding file: "+filename)
-            difference(df_short,df_fast)
-            y = input('continue [y/n]: ')
-            if y == 'n':
-                break   
+            #print("difference between short and fast regarding file: "+filename)
+            diff = difference(df_short,df_fast)
+            try: 
+                if max(diff['err_rel'])>0.000001:
+                    print("significant difference between short and fast regarding file: "+filename)
+                    print(diff)
+            except: print(diff)          
+            #y = input('continue [y/n]: ')
+            #if y == 'n':
+            #    break   
 
-print('Differences:\n- long vs short: '+str(ls)+' \n- long vs fast: '+str(lf)+'\n- short vs fast: '+str(sf))
+print('DIFFERENCES:\n- long vs short: '+str(ls)+' \n- long vs fast: '+str(lf)+'\n- short vs fast: '+str(sf))
 
 # import pandas as pd
 # df_long  = pd.read_csv('solutions/test/long/AnnualVariableOperatingCost.csv')
