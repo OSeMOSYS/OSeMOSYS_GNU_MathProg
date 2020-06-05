@@ -1,0 +1,90 @@
+
+Summary,BB
+Emissions
+
+Cost,46.4312
+
+TID Demand
+
+,BB
+
+,natural_gas
+2016,0
+
+,electricity
+2016,0
+
+Time Dependent Demand (Energy Units)
+
+,BB
+,natural_gas
+,x
+2016,0
+,electricity
+,x
+2016,2.1101
+
+Time Dependent Production (Energy Units) Test
+
+,BB
+,natural_gas
+,x
+2016,2.34242
+,electricity
+,x
+2016,2.1101
+
+TotalAnnualCapacity (Capacity Units)
+,gas_import,gas_plant
+2016,2.34242,3.1101
+
+NewCapacity (Capacity Units )
+
+,gas_import,gas_plant
+2016,2.34242,0
+
+
+Annual Production (Energy Units)
+,BB
+gas_import,natural_gas,electricity
+2016,2.34242,0
+
+gas_plant,natural_gas,electricity
+2016,0,2.1101
+
+Annual Use (Energy Units)
+,BB
+gas_import,natural_gas,electricity
+2016,0,0
+
+gas_plant,natural_gas,electricity
+2016,2.34242,0
+
+
+ProductionByTechnology (Energy Units)
+
+,BB
+gas_import,natural_gas,x,electricity,x
+2016,,2.34242,,0
+gas_plant,natural_gas,x,electricity,x
+2016,,0,,2.1101
+
+Use By Technology (Energy Units)
+
+,BB
+gas_import,natural_gas,x,electricity,x
+2016,,0,,0
+gas_plant,natural_gas,x,electricity,x
+2016,,2.34242,,0
+
+Annual Emissions (Emissions Units)
+,BB
+
+Annual Emissions by Technology (Emissions Units)
+,BB
+gas_import
+2016
+
+gas_plant
+2016
+

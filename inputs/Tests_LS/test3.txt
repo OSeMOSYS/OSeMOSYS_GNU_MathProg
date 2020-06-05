@@ -1,0 +1,269 @@
+
+param ResultsPath := "solutions/Tests_LS/test3/fast";
+###############
+#    Sets     #
+###############
+#
+set DAILYTIMEBRACKET := Day Night ;
+set EMISSION :=  ;
+set MODE_OF_OPERATION := 1 ;
+set FUEL := Biomass Electricity Gas Gas_res Solar ;
+set DAYTYPE := OneWeekDay ;
+set REGION := Region ;
+set YEAR := 2020 2021 2022 2023 2024 2025 ;
+set TECHNOLOGY := BiomassExtraction BiomassPlant GasExtraction GasGrid GasTurbine SolarPV Sun ;
+set STORAGE :=  ;
+set TIMESLICE := DayDay DayNight ;
+set SEASON := Season ;
+
+
+#####################
+#    Parameters     #
+#####################
+#
+param AccumulatedAnnualDemand default 0 :=
+[Region,*,*]:
+2020 2021 2022 2023 2024 2025:=
+Electricity 1000 1000 1000 1000 1000 1000
+Gas 500 500 500 500 500 500
+;
+
+param AnnualEmissionLimit default 99999 :=
+;
+
+param AnnualExogenousEmission default 0 :=
+;
+
+param AvailabilityFactor default 1 :=
+;
+
+param CapacityFactor default 1 :=
+[Region,BiomassPlant,*,*]:
+2020 2021 2022 2023 2024 2025:=
+DayDay 0.5 0.5 0.5 0.5 0.5 0.5
+DayNight 0.5 0.5 0.5 0.5 0.5 0.5
+[Region,GasTurbine,*,*]:
+2020 2021 2022 2023 2024 2025:=
+DayDay 0.5 0.5 0.5 0.5 0.5 0.5
+DayNight 0.5 0.5 0.5 0.5 0.5 0.5
+[Region,SolarPV,*,*]:
+2020 2021 2022 2023 2024 2025:=
+DayDay 0.3 0.3 0.3 0.3 0.3 0.3
+DayNight 0 0 0 0 0 0
+;
+
+param CapacityOfOneTechnologyUnit default 0 :=
+;
+
+param CapacityToActivityUnit default 1 :
+BiomassExtraction BiomassPlant GasExtraction GasGrid GasTurbine SolarPV Sun:=
+Region 1 8.76 1 1 8.76 8.76 1
+;
+
+param CapitalCost default 0.0001 :=
+;
+
+param CapitalCostStorage default 0 :=
+;
+
+param Conversionld default 0 :
+OneWeekDay:=
+DayDay 1
+DayNight 1
+;
+
+param Conversionlh default 0 :
+Day Night:=
+DayNight 1 1
+;
+
+param Conversionls default 0 :
+Season:=
+DayDay 1
+DayNight 1
+;
+
+param DaySplit default 0.00137 :=
+;
+
+param DaysInDayType default 7 :=
+;
+
+param DepreciationMethod default 1 :=
+;
+
+param DiscountRate default 0.05 :=
+;
+
+param EmissionActivityRatio default 0 :=
+;
+
+param EmissionsPenalty default 0 :=
+;
+
+param FixedCost default 0 :=
+;
+
+param InputActivityRatio default 0 :=
+[Region,BiomassPlant,Biomass,*,*]:
+2020 2021 2022 2023 2024 2025:=
+1 3 3 3 3 3 3
+[Region,GasGrid,Gas,*,*]:
+2020 2021 2022 2023 2024 2025:=
+1 1.1 1.1 1.1 1.1 1.1 1.1
+[Region,GasTurbine,Gas,*,*]:
+2020 2021 2022 2023 2024 2025:=
+1 3 3 3 3 3 3
+[Region,SolarPV,Solar,*,*]:
+2020 2021 2022 2023 2024 2025:=
+1 1 1 1 1 1 1
+;
+
+param MinStorageCharge default 0 :=
+;
+
+param ModelPeriodEmissionLimit default 99999 :=
+;
+
+param ModelPeriodExogenousEmission default 0 :=
+;
+
+param OperationalLife default 1 :
+BiomassExtraction BiomassPlant GasExtraction GasGrid GasTurbine SolarPV Sun:=
+Region 10 10 10 10 10 10 10
+;
+
+param OperationalLifeStorage default 1 :=
+;
+
+param OutputActivityRatio default 0 :=
+[Region,BiomassExtraction,Biomass,*,*]:
+2020 2021 2022 2023 2024 2025:=
+1 1 1 1 1 1 1
+[Region,BiomassPlant,Electricity,*,*]:
+2020 2021 2022 2023 2024 2025:=
+1 1 1 1 1 1 1
+[Region,GasExtraction,Gas,*,*]:
+2020 2021 2022 2023 2024 2025:=
+1 1 1 1 1 1 1
+[Region,GasGrid,Gas_res,*,*]:
+2020 2021 2022 2023 2024 2025:=
+1 1 1 1 1 1 1
+[Region,GasTurbine,Electricity,*,*]:
+2020 2021 2022 2023 2024 2025:=
+1 1 1 1 1 1 1
+[Region,SolarPV,Electricity,*,*]:
+2020 2021 2022 2023 2024 2025:=
+1 1 1 1 1 1 1
+[Region,Sun,Solar,*,*]:
+2020 2021 2022 2023 2024 2025:=
+1 1 1 1 1 1 1
+;
+
+param REMinProductionTarget default 0 :=
+;
+
+param RETagFuel default 0 :=
+;
+
+param RETagTechnology default 0 :=
+;
+
+param ReserveMargin default 0 :=
+;
+
+param ReserveMarginTagFuel default 0 :=
+;
+
+param ReserveMarginTagTechnology default 0 :=
+;
+
+param ResidualCapacity default 0 :=
+[Region,*,*]:
+2020 2021 2022 2023 2024 2025:=
+BiomassPlant 100 100 100 100 100 100
+GasTurbine 300 300 300 300 300 300
+SolarPV 100 100 100 100 100 100
+;
+
+param ResidualStorageCapacity default 0 :=
+;
+
+param SpecifiedAnnualDemand default 0 :=
+[Region,*,*]:
+2020 2021 2022 2023 2024 2025:=
+Electricity 1000 1000 1000 1000 1000 1000
+;
+
+param SpecifiedDemandProfile default 0 :=
+[Region,Electricity,*,*]:
+2020 2021 2022 2023 2024 2025:=
+DayDay 0.5 0.5 0.5 0.5 0.5 0.5
+DayNight 0.5 0.5 0.5 0.5 0.5 0.5
+;
+
+param StorageLevelStart default 0 :=
+;
+
+param StorageMaxChargeRate default 0 :=
+;
+
+param StorageMaxDischargeRate default 0 :=
+;
+
+param TechnologyFromStorage default 0 :=
+;
+
+param TechnologyToStorage default 0 :=
+;
+
+param TotalAnnualMaxCapacity default 99999 :=
+;
+
+param TotalAnnualMaxCapacityInvestment default 99999 :=
+[Region,*,*]:
+2020 2021 2022 2023 2024 2025:=
+BiomassPlant 0 0 0 0 0 0
+GasTurbine 0 0 0 0 0 0
+SolarPV 0 0 0 0 0 0
+;
+
+param TotalAnnualMinCapacity default 0 :=
+;
+
+param TotalAnnualMinCapacityInvestment default 0 :=
+;
+
+
+param TotalTechnologyAnnualActivityLowerLimit default 0 :=
+;
+
+param TotalTechnologyAnnualActivityUpperLimit default 99999 :=
+;
+
+param TotalTechnologyModelPeriodActivityLowerLimit default 0 :=
+;
+
+param TotalTechnologyModelPeriodActivityUpperLimit default 99999 :=
+;
+
+param TradeRoute default 0 :=
+;
+
+param VariableCost default 0.0001 :=
+[Region,BiomassExtraction,*,*]:
+2020 2021 2022 2023 2024 2025:=
+1 1 1 1 1 1 1
+[Region,GasExtraction,*,*]:
+2020 2021 2022 2023 2024 2025:=
+1 3 3 3 3 3 3
+;
+
+param YearSplit default 0 :
+2020 2021 2022 2023 2024 2025:=
+DayDay 0.5 0.5 0.5 0.5 0.5 0.5
+DayNight 0.5 0.5 0.5 0.5 0.5 0.5
+;
+
+#
+end;

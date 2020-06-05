@@ -1,0 +1,3 @@
+REGION,TIMESLICE,TECHNOLOGY,FUEL,YEAR,VALUE
+"BB","x","gas_import","natural_gas",2016,2.34242201
+"BB","x","gas_plant","electricity",2016,2.1101
