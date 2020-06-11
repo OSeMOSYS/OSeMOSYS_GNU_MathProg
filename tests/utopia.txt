@@ -18,7 +18,7 @@
 param	AnnualExogenousEmission			default	0		:=	;
 param	AnnualEmissionLimit				default	-1	:=	;
 param	ModelPeriodExogenousEmission	default	0		:=	;
-param	ModelPeriodEmissionLimit		default	9999	:=	;
+param	ModelPeriodEmissionLimit		default	-1	:=	;
 #****************************************
 param ResultsPath := "results";
 #****************************************
