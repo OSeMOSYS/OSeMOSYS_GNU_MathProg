@@ -1,13 +1,13 @@
 # OSeMOSYS GNU MathProg
 
-To run OSeMOSYS, enter the following line into your command prompt and 
+To run OSeMOSYS, enter the following line into your command prompt and
 data file name:
 
     glpsol -m osemosys.txt -d  ../Training_Case_Studies/utopia.txt -o results.csv
 
-Alternatively, install GUSEK (http://gusek.sourceforge.net/gusek.html) 
+Alternatively, install GUSEK (http://gusek.sourceforge.net/gusek.html)
 and run the model within this integrated development environment (IDE).
-To do so, open the datafile (e.g. `atlantis.txt`) and 
+To do so, open the datafile (e.g. `utopia.txt`) and
 select "Use External .dat file" from the Options menu.
 Then change to the model file and select the "Go" icon or press F5.
 
@@ -32,10 +32,10 @@ The tests are stored in the ``tests`` folder.
 ### Running the tests
 
 To run the tests on your local computer, you need a Python 3.7 installation.
-The easiest way to install this is using 
+The easiest way to install this is using
 [miniconda](https://docs.conda.io/en/latest/miniconda.html).
 
-Then you need to install pytest `conda install pytest` and can then run the tests
+Then you need to install pytest `conda install pytest pandas` and can then run the tests
 using the command `pytest`.
 
 Each of the tests in the `tests` folder runs an OSeMOSYS model file and checks that

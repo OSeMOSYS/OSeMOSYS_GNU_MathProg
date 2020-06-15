@@ -80,5 +80,10 @@ set MODExTECHNOLOGYperFUELin{COMMODITY} within MODE_OF_OPERATION cross TECHNOLOG
 set MODExTECHNOLOGYperSTORAGEto{STORAGE} within MODE_OF_OPERATION cross TECHNOLOGY;
 set MODExTECHNOLOGYperSTORAGEfrom{STORAGE} within MODE_OF_OPERATION cross TECHNOLOGY;
 ```
+## RunHPCNodes.py
 
+This script was written by Taco Niet to run a large number of scenarios on a HPC system managed by the SLURM scheduler.  The script creates the data files for a large number of scenarios using pre-set scenario parameter lists and then submits the list of jobs to full nodes of the HPC system using the parallel command to utilize the full node.  This script works best when there are a large number of scenarios that each take a very short amount of time to run.
 
+First edit the python script for the parameters and scenario combinations you want to investigate.  Then place the 'params_base.dat' file in the directory along with the 'RunHPCNodes.py' script and the OSeMOSYS.mod file.  Log into the login node of the HPC cluster and run the python file.
+
+Note:  The number of scenarios can quickly become quite large with this script so managing the number of runs and how long of a wall time they need is important to consider.  Choose the walltime, number of runs to group and other parameters carefully.
