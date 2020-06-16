@@ -56,7 +56,7 @@ param ResultsPath, symbolic default 'results';
 param YearSplit{l in TIMESLICE, y in YEAR};
 param DiscountRate{r in REGION};
 param CapitalRecoveryFactor{r in REGION, y in YEAR} :=
-      (1 + DiscountRate[r])^(y - min{yy in YEAR} min(yy));
+    (1 + DiscountRate[r])^(y - min{yy in YEAR} min(yy));
 param CapitalRecoveryFactorMid{r in REGION, y in YEAR} :=
 	(1 + DiscountRate[r]) ^ (y - min{yy in YEAR} min(yy) + 0.5);
 param CapitalRecoveryFactorHorizon{r in REGION} :=
