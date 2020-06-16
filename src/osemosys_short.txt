@@ -59,10 +59,9 @@ param CapitalRecoveryFactor{r in REGION, y in YEAR} :=
       (1 + DiscountRate[r])^(y - min{yy in YEAR} min(yy));
 param CapitalRecoveryFactorMid{r in REGION, y in YEAR} :=
 	(1 + DiscountRate[r]) ^ (y - min{yy in YEAR} min(yy) + 0.5);
-param CapitalRecoveryFactorEnd{r in REGION, y in YEAR} :=
+param CapitalRecoveryFactorHorizon{r in REGION} :=
     (1 + DiscountRate[r]) ^ (max{yy in YEAR} max(yy) - min{yy in YEAR} min(yy) + 1.0);
-    # ((1+DiscountRate[r])^(1+max{yy in YEAR} max(yy)-min{yy in YEAR} min(yy)))
-param CapitalRecoveryFactorOtherEnd{r in REGION, y in YEAR} :=
+param CapitalRecoveryFactorToEnd{r in REGION, y in YEAR} :=
     (1 + DiscountRate[r]) ^ (max{yy in YEAR} max(yy) - y + 1) - 1;
 param DaySplit{lh in DAILYTIMEBRACKET, y in YEAR};
 param Conversionls{l in TIMESLICE, ls in SEASON};
@@ -205,7 +204,7 @@ minimize cost: sum{r in REGION, t in TECHNOLOGY, y in YEAR}
 ) + 
     sum{r in REGION, s in STORAGE, y in YEAR}
         (CapitalCostStorage[r,s,y] * NewStorageCapacity[r,s,y] / CapitalRecoveryFactor[r,y] -
-        SalvageValueStorage[r,s,y] / CapitalRecoveryFactorEnd[r, y]);
+        SalvageValueStorage[r,s,y] / CapitalRecoveryFactorHorizon[r]);
 #
 #####################
 # Constraints       #
@@ -268,15 +267,15 @@ s.t. SI7_SalvageValueStorageAtEndOfPeriod2{r in REGION, s in STORAGE, y in YEAR:
 s.t. SI8_SalvageValueStorageAtEndOfPeriod3{r in REGION, s in STORAGE, y in YEAR: 
     DepreciationMethod[r]=1 && (y+OperationalLifeStorage[r,s]-1) > (max{yy in YEAR} max(yy)) && DiscountRate[r]>0}: 
     CapitalCostStorage[r,s,y] * NewStorageCapacity[r,s,y] * 
-    (1-((CapitalRecoveryFactorOtherEnd[r,y]) / 
+    (1-((CapitalRecoveryFactorToEnd[r,y]) / 
     ((1+DiscountRate[r])^OperationalLifeStorage[r,s]-1))) = SalvageValueStorage[r,s,y];
 #
 #########           Salvage Value                    #############
 #
-s.t. SV1_SalvageValueAtEndOfPeriod1{r in REGION, t in TECHNOLOGY, y in YEAR: DepreciationMethod[r]=1 && (y + OperationalLife[r,t]-1) > (max{yy in YEAR} max(yy)) && DiscountRate[r]>0}: SalvageValue[r,t,y] = CapitalCost[r,t,y]*NewCapacity[r,t,y]*(1-((CapitalRecoveryFactorOtherEnd[r,y])/((1+DiscountRate[r])^OperationalLife[r,t]-1)));
+s.t. SV1_SalvageValueAtEndOfPeriod1{r in REGION, t in TECHNOLOGY, y in YEAR: DepreciationMethod[r]=1 && (y + OperationalLife[r,t]-1) > (max{yy in YEAR} max(yy)) && DiscountRate[r]>0}: SalvageValue[r,t,y] = CapitalCost[r,t,y]*NewCapacity[r,t,y]*(1-((CapitalRecoveryFactorToEnd[r,y])/((1+DiscountRate[r])^OperationalLife[r,t]-1)));
 s.t. SV2_SalvageValueAtEndOfPeriod2{r in REGION, t in TECHNOLOGY, y in YEAR: DepreciationMethod[r]=1 && (y + OperationalLife[r,t]-1) > (max{yy in YEAR} max(yy)) && DiscountRate[r]=0 || (DepreciationMethod[r]=2 && (y + OperationalLife[r,t]-1) > (max{yy in YEAR} max(yy)))}: SalvageValue[r,t,y] = CapitalCost[r,t,y]*NewCapacity[r,t,y]*(1-(max{yy in YEAR} max(yy) - y+1)/OperationalLife[r,t]);
 s.t. SV3_SalvageValueAtEndOfPeriod3{r in REGION, t in TECHNOLOGY, y in YEAR: (y + OperationalLife[r,t]-1) <= (max{yy in YEAR} max(yy))}: SalvageValue[r,t,y] = 0;
-s.t. SV4_SalvageValueDiscountedToStartYear{r in REGION, t in TECHNOLOGY, y in YEAR}: DiscountedSalvageValue[r,t,y] = SalvageValue[r,t,y] / CapitalRecoveryFactorEnd[r,y];
+s.t. SV4_SalvageValueDiscountedToStartYear{r in REGION, t in TECHNOLOGY, y in YEAR}: DiscountedSalvageValue[r,t,y] = SalvageValue[r,t,y] / CapitalRecoveryFactorHorizon[r];
 ##
 #########                      Total Capacity Constraints         ##############
 #
