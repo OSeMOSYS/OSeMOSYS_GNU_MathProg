@@ -1,6 +1,17 @@
 # OSeMOSYS Change Log
 
-## Conditional operators added to 6 parameters
+## Version 1.0.0
+
+### Folder of CSV result parameters added
+
+- Results parameters are written out into individual files in long format.
+- Headers correspond to the index of the variable, e.g. `REGION,FUEL,VALUE`
+
+### Adds ResultPath parameter to choose location of results
+
+Data files should now include a `ResultPath` parameter to choose the location of the results
+
+### Conditional operators added to 6 parameters
 
 Pull request #30 @tniet, @willu47
 

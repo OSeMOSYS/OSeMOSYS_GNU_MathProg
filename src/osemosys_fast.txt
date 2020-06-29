@@ -56,7 +56,8 @@ set STORAGE;
 #
 param ResultsPath, symbolic default 'results';
 param YearSplit{l in TIMESLICE, y in YEAR};
-param DiscountRate{r in REGION, t in TECHNOLOGY};
+=======
+param DiscountRate{r in REGION};
 param DiscountRateStorage{r in REGION, s in STORAGE};
 param DaySplit{lh in DAILYTIMEBRACKET, y in YEAR};
 param Conversionls{l in TIMESLICE, ls in SEASON};

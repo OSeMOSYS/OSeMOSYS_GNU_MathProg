@@ -18,7 +18,7 @@
 param	AnnualExogenousEmission			default	0		:=	;
 param	AnnualEmissionLimit				default	-1	:=	;
 param	ModelPeriodExogenousEmission	default	0		:=	;
-param	ModelPeriodEmissionLimit		default	9999	:=	;
+param	ModelPeriodEmissionLimit		default	-1	:=	;
 #****************************************
 param ResultsPath := "results";
 #****************************************
@@ -77,6 +77,7 @@ set DAILYTIMEBRACKET	:=	1	2	;
 set	STORAGE	:=	DAM	;
 #
 param DiscountRate default 0.05 :=;
+param DiscountRateStorage default 0.05 :=;
 #
 # DepreciationMethod; equal to 1 for Sinking Fund and 2 for Straight Line Depreciation
 param DepreciationMethod default 1 :=;
