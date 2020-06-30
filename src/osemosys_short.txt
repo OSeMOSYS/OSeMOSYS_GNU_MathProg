@@ -991,15 +991,6 @@ table TotalDiscountedCostResults
                  - CapitalCostStorage[r,s,y] * NewStorageCapacity[r,s,y] / ((1 + DiscountRateStorage[r,s])^(y - min{yy in YEAR} min(yy)))
           )~VALUE;
 
-                RateOfActivity[r,l,t,m,y] * YearSplit[l,y] * VariableCost[r,t,m,y]) / ((1 + DiscountRate[r,t])^(y-min{yy in YEAR} min(yy) + 0.5))
-          + CapitalCost[r,t,y] * NewCapacity[r,t,y] / ((1 + DiscountRate[r,t])^(y - min{yy in YEAR} min(yy)))
-          + DiscountedTechnologyEmissionsPenalty[r,t,y]
-          - DiscountedSalvageValue[r,t,y])
-          + sum{s in STORAGE}
-                (CapitalCostStorage[r,s,y] * NewStorageCapacity[r,s,y] / ((1 + DiscountRateStorage[r,s])^(y - min{yy in YEAR} min(yy)))
-                 - CapitalCostStorage[r,s,y] * NewStorageCapacity[r,s,y] / ((1 + DiscountRateStorage[r,s])^(y - min{yy in YEAR} min(yy)))
-          )~VALUE;
-
 table TotalTechnologyAnnualActivity
     {r in REGION, t in TECHNOLOGY, y in YEAR:
         sum{l in TIMESLICE, m in MODE_OF_OPERATION}
