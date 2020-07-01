@@ -264,7 +264,7 @@ minimize cost: sum{r in REGION, t in TECHNOLOGY, y in YEAR}
             + DiscountedTechnologyEmissionsPenalty[r,t,y] - DiscountedSalvageValue[r,t,y]))
     + sum{r in REGION, s in STORAGE, y in YEAR}
         (CapitalCostStorage[r,s,y] * NewStorageCapacity[r,s,y] / CapitalRecoveryFactorStorage[r,s,y] 
-            - SalvageValueStorage[r,s,y] / ((1+DiscountRate[r])^(max{yy in YEAR} max(yy)-min{yy in YEAR} min(yy)+1)));
+            - SalvageValueStorage[r,s,y] / ((1+DiscountRateStorage[r,s])^(max{yy in YEAR} max(yy)-min{yy in YEAR} min(yy)+1)));
 #
 #####################
 # Constraints       #
@@ -312,7 +312,7 @@ s.t. EBb4_EnergyBalanceEachYear4{r in REGION, f in FUEL, y in YEAR}: sum{m in MO
 #s.t. Acc1_FuelProductionByTechnology{r in REGION, l in TIMESLICE, t in TECHNOLOGY, f in FUEL, y in YEAR}: sum{m in MODE_OF_OPERATION: OutputActivityRatio[r,t,f,m,y] <>0} RateOfActivity[r,l,t,m,y]*OutputActivityRatio[r,t,f,m,y] * YearSplit[l,y] = ProductionByTechnology[r,l,t,f,y];
 #s.t. Acc2_FuelUseByTechnology{r in REGION, l in TIMESLICE, t in TECHNOLOGY, f in FUEL, y in YEAR}: sum{m in MODE_OF_OPERATION: InputActivityRatio[r,t,f,m,y]<>0} RateOfActivity[r,l,t,m,y]*InputActivityRatio[r,t,f,m,y] * YearSplit[l,y] = UseByTechnology[r,l,t,f,y];
 #s.t. Acc3_AverageAnnualRateOfActivity{r in REGION, t in TECHNOLOGY, m in MODE_OF_OPERATION, y in YEAR}: sum{l in TIMESLICE} RateOfActivity[r,l,t,m,y]*YearSplit[l,y] = TotalAnnualTechnologyActivityByMode[r,t,m,y];
-####s.t. Acc4_ModelPeriodCostByRegion{r in REGION}:sum{t in TECHNOLOGY, y in YEAR}(((((sum{yy in YEAR: y-yy < OperationalLife[r,t] && y-yy>=0} NewCapacity[r,t,yy])+ ResidualCapacity[r,t,y])*FixedCost[r,t,y] + sum{m in MODE_OF_OPERATION, l in TIMESLICE} RateOfActivity[r,l,t,m,y]*YearSplit[l,y]*VariableCost[r,t,m,y])/((CapitalRecoveryFactorMid[r,t,y]))+CapitalCost[r,t,y] * NewCapacity[r,t,y]/((CapitalRecoveryFactor[r,t,y]))+DiscountedTechnologyEmissionsPenalty[r,t,y]-DiscountedSalvageValue[r,t,y]) + sum{s in STORAGE} (CapitalCostStorage[r,s,y] * NewStorageCapacity[r,s,y]/((CapitalRecoveryFactor[r,t,y]))-CapitalCostStorage[r,s,y] * NewStorageCapacity[r,s,y]/((CapitalRecoveryFactor[r,t,y])))) = ModelPeriodCostByRegion[r];
+####s.t. Acc4_ModelPeriodCostByRegion{r in REGION}:sum{t in TECHNOLOGY, y in YEAR}(((((sum{yy in YEAR: y-yy < OperationalLife[r,t] && y-yy>=0} NewCapacity[r,t,yy])+ ResidualCapacity[r,t,y])*FixedCost[r,t,y] + sum{m in MODE_OF_OPERATION, l in TIMESLICE} RateOfActivity[r,l,t,m,y]*YearSplit[l,y]*VariableCost[r,t,m,y])/((CapitalRecoveryFactorMid[r,t,y]))+CapitalCost[r,t,y] * NewCapacity[r,t,y]/((CapitalRecoveryFactor[r,t,y]))+DiscountedTechnologyEmissionsPenalty[r,t,y]-DiscountedSalvageValue[r,t,y]) + sum{s in STORAGE} (CapitalCostStorage[r,s,y] * NewStorageCapacity[r,s,y]/CapitalRecoveryFactorStorage[r,s,y]-CapitalCostStorage[r,s,y] * NewStorageCapacity[r,s,y]/CapitalRecoveryFactorStorage[r,s,y])) = ModelPeriodCostByRegion[r];
 #
 #########                Storage Equations                        #############
 #
@@ -360,7 +360,7 @@ s.t. SI8_SalvageValueStorageAtEndOfPeriod3{r in REGION, s in STORAGE, y in YEAR:
 #s.t. SI3_TotalNewStorage{r in REGION, s in STORAGE, y in YEAR}: sum{yy in YEAR: y-yy < OperationalLifeStorage[r,s] && y-yy>=0} NewStorageCapacity[r,s,yy]=AccumulatedNewStorageCapacity[r,s,y];
 #s.t. SI4_UndiscountedCapitalInvestmentStorage{r in REGION, s in STORAGE, y in YEAR}: CapitalCostStorage[r,s,y] * NewStorageCapacity[r,s,y] = CapitalInvestmentStorage[r,s,y];
 #s.t. SI5_DiscountingCapitalInvestmentStorage{r in REGION, s in STORAGE, y in YEAR}: CapitalCostStorage[r,s,y] * NewStorageCapacity[r,s,y]/((CapitalRecoveryFactorStorage[r,s,y])) = DiscountedCapitalInvestmentStorage[r,s,y];
-#s.t. SI9_SalvageValueStorageDiscountedToStartYear{r in REGION, s in STORAGE, y in YEAR}: SalvageValueStorage[r,s,y]/((1+DiscountRate[r])^(max{yy in YEAR} max(yy)-min{yy in YEAR} min(yy)+1)) = DiscountedSalvageValueStorage[r,s,y];
+#s.t. SI9_SalvageValueStorageDiscountedToStartYear{r in REGION, s in STORAGE, y in YEAR}: SalvageValueStorage[r,s,y]/((1+DiscountRateStorage[r,s])^(max{yy in YEAR} max(yy)-min{yy in YEAR} min(yy)+1)) = DiscountedSalvageValueStorage[r,s,y];
 #s.t. SI10_TotalDiscountedCostByStorage{r in REGION, s in STORAGE, y in YEAR}: (CapitalCostStorage[r,s,y] * NewStorageCapacity[r,s,y]/((CapitalRecoveryFactorStorage[r,s,y]))-CapitalCostStorage[r,s,y] * NewStorageCapacity[r,s,y]/((CapitalRecoveryFactorStorage[r,s,y]))) = TotalDiscountedStorageCost[r,s,y];
 #
 #########               Capital Costs                              #############
@@ -487,7 +487,7 @@ for {r in REGION}         {
                                         }
 printf "\n" >> ResultsPath & "/SelectedResults.csv";
 printf "Cost" >> ResultsPath & "/SelectedResults.csv";
-for {r in REGION} {printf ",%g", sum{t in TECHNOLOGY, y in YEAR}(((((sum{yy in YEAR: y-yy < OperationalLife[r,t] && y-yy>=0} NewCapacity[r,t,yy])+ ResidualCapacity[r,t,y])*FixedCost[r,t,y] + sum{m in MODE_OF_OPERATION, l in TIMESLICE} RateOfActivity[r,l,t,m,y]*YearSplit[l,y]*VariableCost[r,t,m,y])/((CapitalRecoveryFactorMid[r,t,y]))+CapitalCost[r,t,y] * NewCapacity[r,t,y]/((CapitalRecoveryFactor[r,t,y]))+DiscountedTechnologyEmissionsPenalty[r,t,y]-DiscountedSalvageValue[r,t,y]) + sum{s in STORAGE} (CapitalCostStorage[r,s,y] * NewStorageCapacity[r,s,y]/((CapitalRecoveryFactorStorage[r,s,y]))-CapitalCostStorage[r,s,y] * NewStorageCapacity[r,s,y]/((CapitalRecoveryFactorStorage[r,s,y])))) >> ResultsPath & "/SelectedResults.csv";
+for {r in REGION} {printf ",%g", sum{t in TECHNOLOGY, y in YEAR}(((((sum{yy in YEAR: y-yy < OperationalLife[r,t] && y-yy>=0} NewCapacity[r,t,yy])+ ResidualCapacity[r,t,y])*FixedCost[r,t,y] + sum{m in MODE_OF_OPERATION, l in TIMESLICE} RateOfActivity[r,l,t,m,y]*YearSplit[l,y]*VariableCost[r,t,m,y])/((CapitalRecoveryFactorMid[r,t,y]))+CapitalCost[r,t,y] * NewCapacity[r,t,y]/((CapitalRecoveryFactor[r,t,y]))+DiscountedTechnologyEmissionsPenalty[r,t,y]-DiscountedSalvageValue[r,t,y]) + sum{s in STORAGE} (CapitalCostStorage[r,s,y] * NewStorageCapacity[r,s,y]/CapitalRecoveryFactorStorage[r,s,y]-CapitalCostStorage[r,s,y] * NewStorageCapacity[r,s,y]/CapitalRecoveryFactorStorage[r,s,y])) >> ResultsPath & "/SelectedResults.csv";
 }
 printf "\n" >> ResultsPath & "/SelectedResults.csv";
 #
