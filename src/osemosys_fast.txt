@@ -62,10 +62,11 @@ param CapitalRecoveryFactor{r in REGION, t in TECHNOLOGY, y in YEAR} :=
 	(1 + DiscountRate[r,t]) ^ (y - min{yy in YEAR} min(yy) + 0.0);
 param CapitalRecoveryFactorMid{r in REGION, t in TECHNOLOGY, y in YEAR} :=
 	(1 + DiscountRate[r,t]) ^ (y - min{yy in YEAR} min(yy) + 0.5);
+
+param DiscountRateStorage{r in REGION, s in STORAGE};
 param CapitalRecoveryFactorStorage{r in REGION, s in STORAGE, y in YEAR} :=
 	(1 + DiscountRate[r,s]) ^ (y - min{yy in YEAR} min(yy) + 0.0);
 
-param DiscountRateStorage{r in REGION, s in STORAGE};
 
 param DaySplit{lh in DAILYTIMEBRACKET, y in YEAR};
 param Conversionls{l in TIMESLICE, ls in SEASON};

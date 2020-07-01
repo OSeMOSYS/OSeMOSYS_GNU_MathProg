@@ -57,9 +57,9 @@ param YearSplit{l in TIMESLICE, y in YEAR};
 
 param DiscountRate{r in REGION, t in TECHNOLOGY};
 param CapitalRecoveryFactor{r in REGION, t in TECHNOLOGY, y in YEAR} :=
-      (1 + DiscountRate[r])^(y - min{yy in YEAR} min(yy));
+      (1 + DiscountRate[r,t])^(y - min{yy in YEAR} min(yy));
 param CapitalRecoveryFactorMid{r in REGION, t in TECHNOLOGY, y in YEAR} :=
-	(1 + DiscountRate[r]) ^ (y - min{yy in YEAR} min(yy) + 0.5);
+	(1 + DiscountRate[r,t]) ^ (y - min{yy in YEAR} min(yy) + 0.5);
 
 param DiscountRateStorage{r in REGION, s in STORAGE};
 param CapitalRecoveryFactorStorage{r in REGION, s in STORAGE, y in YEAR} :=
@@ -249,7 +249,22 @@ var ModelPeriodEmissions{r in REGION, e in EMISSION}>=0;
 # Objective Function #
 ######################
 #
-minimize cost: sum{r in REGION, t in TECHNOLOGY, y in YEAR}(((((sum{yy in YEAR: y-yy < OperationalLife[r,t] && y-yy>=0}NewCapacity[r,t,yy])+ResidualCapacity[r,t,y])*FixedCost[r,t,y]+sum{m in MODE_OF_OPERATION, l in TIMESLICE}RateOfActivity[r,l,t,m,y]*YearSplit[l,y]*VariableCost[r,t,m,y])/(CapitalRecoveryFactorMid[r,t,y])+CapitalCost[r,t,y] * NewCapacity[r,t,y]/((CapitalRecoveryFactor[r,t,y]))+DiscountedTechnologyEmissionsPenalty[r,t,y]-DiscountedSalvageValue[r,t,y]))+sum{r in REGION, s in STORAGE, y in YEAR}(CapitalCostStorage[r,s,y] * NewStorageCapacity[r,s,y]/((CapitalRecoveryFactor[r,t,y]))-SalvageValueStorage[r,s,y]/((1+DiscountRate[r])^(max{yy in YEAR} max(yy)-min{yy in YEAR} min(yy)+1)));
+minimize cost: sum{r in REGION, t in TECHNOLOGY, y in YEAR}
+    (
+        (
+            (
+                (
+                    (sum{yy in YEAR: y-yy < OperationalLife[r,t] && y-yy>=0}
+                        NewCapacity[r,t,yy]) 
+                + ResidualCapacity[r,t,y]) * FixedCost[r,t,y] + 
+                sum{m in MODE_OF_OPERATION, l in TIMESLICE}
+                    RateOfActivity[r,l,t,m,y] * YearSplit[l,y] * VariableCost[r,t,m,y]) 
+            / CapitalRecoveryFactorMid[r,t,y]
+            + CapitalCost[r,t,y] * NewCapacity[r,t,y] / CapitalRecoveryFactor[r,t,y] 
+            + DiscountedTechnologyEmissionsPenalty[r,t,y] - DiscountedSalvageValue[r,t,y]))
+    + sum{r in REGION, s in STORAGE, y in YEAR}
+        (CapitalCostStorage[r,s,y] * NewStorageCapacity[r,s,y] / CapitalRecoveryFactorStorage[r,s,y] 
+            - SalvageValueStorage[r,s,y] / ((1+DiscountRate[r])^(max{yy in YEAR} max(yy)-min{yy in YEAR} min(yy)+1)));
 #
 #####################
 # Constraints       #
