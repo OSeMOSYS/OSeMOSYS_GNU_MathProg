@@ -69,7 +69,7 @@ Pre-processing consists of the following steps:
 
 This pre-processing can be run on a terminal window with the following command:
 ```
-python preprocess_data.py <input_data_file.txt> <preprocessed_data_file.txt>
+python preprocess_data.py <otoole/momani> <input_data_file.txt> <preprocessed_data_file.txt>
 ``` 
 
 In order to start a model run with a pre-processed data file, the following sets need to be included in the associated OSeMOSYS model file:
