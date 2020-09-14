@@ -163,16 +163,20 @@ printf "Capacity investment check successful \n";
 check{r in REGION, t in TECHNOLOGY, y in YEAR:TotalTechnologyAnnualActivityUpperLimit[r,t,y]<>-1 && TotalTechnologyAnnualActivityUpperLimit[r,t,y]<>0 && TotalTechnologyAnnualActivityLowerLimit[r,t,y]<>0}: TotalTechnologyAnnualActivityUpperLimit[r,t,y]>=TotalTechnologyAnnualActivityLowerLimit[r,t,y];
 printf "Annual Activity check successful \n";
 #
-##### 'Total capacity' check  #####
-check{r in REGION, t in TECHNOLOGY, y in YEAR:TotalAnnualMaxCapacity[r,t,y]<>0 && ResidualCapacity[r,t,y]<>0 && TotalAnnualMinCapacityInvestment[r, t, y]<>0}: TotalAnnualMaxCapacity[r,t,y]>=ResidualCapacity[r,t,y] + TotalAnnualMinCapacityInvestment[r, t, y];
-printf "Total Capacity check successful \n";
+##### 'Capacity' check 1   #####
+check{r in REGION, t in TECHNOLOGY, y in YEAR:TotalAnnualMaxCapacity[r,t,y]<>-1 && ResidualCapacity[r,t,y]<>0}: TotalAnnualMaxCapacity[r,t,y]>= ResidualCapacity[r,t,y];
+printf "Capacity check 1 successful \n";
+#
+##### 'Capacity' check 2   #####
+check{r in REGION, t in TECHNOLOGY, y in YEAR:TotalAnnualMaxCapacity[r,t,y]<>-1 && ResidualCapacity[r,t,y]<>0}: TotalAnnualMaxCapacity[r,t,y]>= ResidualCapacity[r,t,y] + TotalAnnualMinCapacityInvestment[r, t, y];
+printf "Capacity check 2 successful \n";
 #
 #####  'Minimum Annual activity' check   #####
-check{r in REGION, t in TECHNOLOGY, y in YEAR:TotalAnnualMaxCapacity[r,t,y]<>0 && TotalTechnologyAnnualActivityLowerLimit[r,t,y]<>0 && AvailabilityFactor[r,t,y]<>0 && CapacityToActivityUnit[r,t]<>0}: sum{l in TIMESLICE: CapacityFactor[r,t,l,y]<>0 && YearSplit[l,y]<>0}(CapacityFactor[r,t,l,y]*YearSplit[l,y])*TotalAnnualMaxCapacity[r,t,y]* AvailabilityFactor[r,t,y]*CapacityToActivityUnit[r,t] <= TotalTechnologyAnnualActivityLowerLimit[r,t,y];
+check{r in REGION, t in TECHNOLOGY, y in YEAR:TotalAnnualMaxCapacity[r,t,y]<>0 && TotalAnnualMaxCapacity[r,t,y] <> -1 && TotalTechnologyAnnualActivityLowerLimit[r,t,y]<>0 && AvailabilityFactor[r,t,y]<>0 && CapacityToActivityUnit[r,t]<>0}: sum{l in TIMESLICE: CapacityFactor[r,t,l,y]<>0 && YearSplit[l,y]<>0}(CapacityFactor[r,t,l,y]*YearSplit[l,y])*TotalAnnualMaxCapacity[r,t,y]* AvailabilityFactor[r,t,y]*CapacityToActivityUnit[r,t] >= TotalTechnologyAnnualActivityLowerLimit[r,t,y];
 printf "Minimum Activity check successful \n";
 #
 #####    'Time Slice' check     #####
-check{y in YEAR}: sum{l in TIMESLICE: YearSplit[l,y]<>0} YearSplit[l,y]<=1;
+check{y in YEAR}: sum{l in TIMESLICE: YearSplit[l,y]<>0} YearSplit[l,y]=1;
 printf "Time Slice check successful \n";
 #
 #####   'Model period activity limit' check   #####
