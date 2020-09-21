@@ -146,6 +146,50 @@ param AnnualEmissionLimit{r in REGION, e in EMISSION, y in YEAR};
 param ModelPeriodExogenousEmission{r in REGION, e in EMISSION};
 param ModelPeriodEmissionLimit{r in REGION, e in EMISSION};
 #
+#
+##############
+##
+########################################################################
+#   Check statements to carry out simple debugging in model parameters #
+########################################################################
+
+##### 'Capacity investment' check  #####
+printf "Checking Max and Min capcity-investment bounds for r in REGION, t in TECHNOLOGY, y in YEAR \n";
+#
+check{r in REGION, t in TECHNOLOGY, y in YEAR:TotalAnnualMaxCapacityInvestment[r, t, y]<>0 && TotalAnnualMinCapacityInvestment[r, t, y]<>0}: TotalAnnualMaxCapacityInvestment[r, t, y]>=TotalAnnualMinCapacityInvestment[r, t, y];
+#
+##### 'Annual Activity' check  #####
+printf "Checking Annual activity limits for r in REGION, t in TECHNOLOGY, y in YEAR \n";
+#
+check{r in REGION, t in TECHNOLOGY, y in YEAR:TotalTechnologyAnnualActivityUpperLimit[r,t,y]<>-1 && TotalTechnologyAnnualActivityUpperLimit[r,t,y]<>0 && TotalTechnologyAnnualActivityLowerLimit[r,t,y]<>0}: TotalTechnologyAnnualActivityUpperLimit[r,t,y]>=TotalTechnologyAnnualActivityLowerLimit[r,t,y];
+#
+##### 'Capacity' check 1   #####
+printf "Checking Residual and TotalAnnualMax Capacity for r in REGION, t in TECHNOLOGY, y in YEAR \n";
+#
+check{r in REGION, t in TECHNOLOGY, y in YEAR: TotalAnnualMaxCapacity[r,t,y]<>-1 && ResidualCapacity[r,t,y]<>0}: TotalAnnualMaxCapacity[r,t,y] >= ResidualCapacity[r,t,y];
+#
+##### 'Capacity' check 2   #####
+printf "Checking Residual, Total annual maxcap and mincap investments for  all Region, Tech and Year \n";
+#
+check{r in REGION, t in TECHNOLOGY, y in YEAR:TotalAnnualMaxCapacity[r,t,y]<>-1 && ResidualCapacity[r,t,y]<>0}: TotalAnnualMaxCapacity[r,t,y]>= ResidualCapacity[r,t,y] + TotalAnnualMinCapacityInvestment[r,t,y];
+#
+#####  'Minimum Annual activity' check   #####
+printf "Checking Annual production by technology bounds for r in REGION, t in TECHNOLOGY, y in YEAR \n";
+#
+check{r in REGION, t in TECHNOLOGY, y in YEAR:TotalAnnualMaxCapacity[r,t,y]<>0 && TotalAnnualMaxCapacity[r,t,y] <> -1 && TotalTechnologyAnnualActivityLowerLimit[r,t,y]<>0 && AvailabilityFactor[r,t,y]<>0 && CapacityToActivityUnit[r,t]<>0}: sum{l in TIMESLICE: CapacityFactor[r,t,l,y]<>0 && YearSplit[l,y]<>0}(CapacityFactor[r,t,l,y]*YearSplit[l,y])*TotalAnnualMaxCapacity[r,t,y]* AvailabilityFactor[r,t,y]*CapacityToActivityUnit[r,t] >= TotalTechnologyAnnualActivityLowerLimit[r,t,y];
+#
+#####    'Time Slice' check     #####
+printf "Checking TimeSlices/YearSplits for y in YEAR \n";
+#
+check{y in YEAR}: sum{l in TIMESLICE} YearSplit[l,y] >= 0.9999;
+check{y in YEAR}: sum{l in TIMESLICE} YearSplit[l,y] <= 1.0001;
+#
+#####   'Model period activity limit' check   #####
+printf "Checking Model period activity bounds for r in REGION, t in TECHNOLOGY \n";
+#
+check{r in REGION, t in TECHNOLOGY: TotalTechnologyModelPeriodActivityLowerLimit[r,t]<>0}:TotalTechnologyModelPeriodActivityLowerLimit[r,t] >= sum{y in YEAR: TotalTechnologyAnnualActivityLowerLimit[r,t,y] <>0}TotalTechnologyAnnualActivityLowerLimit[r,t,y];
+
+#
 ######################
 #   Model Variables  #
 ######################
