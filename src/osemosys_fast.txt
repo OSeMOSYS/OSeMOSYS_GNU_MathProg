@@ -73,7 +73,7 @@ param Conversionls{l in TIMESLICE, ls in SEASON};
 param Conversionld{l in TIMESLICE, ld in DAYTYPE};
 param Conversionlh{l in TIMESLICE, lh in DAILYTIMEBRACKET};
 param DaysInDayType{ls in SEASON, ld in DAYTYPE, y in YEAR};
-param TradeRoute{r in REGION, rr in REGION, f in FUEL, y in YEAR};
+param TradeRoute {r in REGION, rr in REGION, f in FUEL, y in YEAR} binary;
 param DepreciationMethod{r in REGION};
 #
 ########                        Demands                                         #############
