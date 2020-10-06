@@ -137,8 +137,8 @@ param ReserveMargin{r in REGION, y in YEAR};
 #
 #########                        RE Generation Target                #############
 #
-param RETagTechnology{r in REGION, t in TECHNOLOGY, y in YEAR};
-param RETagFuel{r in REGION, f in FUEL, y in YEAR};
+param RETagTechnology{r in REGION, t in TECHNOLOGY, y in YEAR} binary;
+param RETagFuel{r in REGION, f in FUEL, y in YEAR} binary;
 param REMinProductionTarget{r in REGION, y in YEAR};
 #
 #########                        Emissions & Penalties                #############
