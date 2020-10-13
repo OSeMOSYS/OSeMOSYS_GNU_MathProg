@@ -1,5 +1,7 @@
 # OSeMOSYS GNU MathProg
 
+Thanks for using OSeMOSYS and welcome to the OSeMOSYS community.
+
 To run OSeMOSYS, enter the following line into your command prompt and
 data file name:
 

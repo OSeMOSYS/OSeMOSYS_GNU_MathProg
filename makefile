@@ -23,7 +23,7 @@ $(BUILDDIR)/osemosys_fast.txt: $(BUILDDIR)
 	cp src/osemosys_fast.txt $(BUILDDIR)/osemosys_fast.txt
 
 $(BUILDDIR)/README.md: $(BUILDDIR)
-	cp README.md $(BUILDDIR)/README.md
+	cp src/README.md $(BUILDDIR)/README.md
 
 $(BUILDDIR)/LICENSE: $(BUILDDIR)
 	cp LICENSE $(BUILDDIR)/LICENSE
