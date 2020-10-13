@@ -225,7 +225,7 @@ class TestOsemosysOutputs:
         )
 
         pd.testing.assert_frame_equal(
-            actual, expected, check_less_precise=True, check_exact=False
+            actual, expected, check_exact=False, rtol=1e-3
         )
 
     def test_results_emissions(self, run_model):

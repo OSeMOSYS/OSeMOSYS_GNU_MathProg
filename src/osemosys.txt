@@ -69,11 +69,11 @@ param CapitalRecoveryFactorMidStorage{r in REGION, s in STORAGE, y in YEAR} :=
 	(1 + DiscountRateStorage[r, s]) ^ (y - min{yy in YEAR} min(yy) + 0.5);  
   
 param DaySplit{lh in DAILYTIMEBRACKET, y in YEAR};
-param Conversionls{l in TIMESLICE, ls in SEASON};
-param Conversionld{l in TIMESLICE, ld in DAYTYPE};
-param Conversionlh{l in TIMESLICE, lh in DAILYTIMEBRACKET};
+param Conversionls{l in TIMESLICE, ls in SEASON} binary;
+param Conversionld{l in TIMESLICE, ld in DAYTYPE} binary;
+param Conversionlh{l in TIMESLICE, lh in DAILYTIMEBRACKET} binary;
 param DaysInDayType{ls in SEASON, ld in DAYTYPE, y in YEAR};
-param TradeRoute{r in REGION, rr in REGION, f in FUEL, y in YEAR};
+param TradeRoute {r in REGION, rr in REGION, f in FUEL, y in YEAR} binary;
 param DepreciationMethod{r in REGION};
 #
 ########			Demands 					#############
@@ -130,14 +130,14 @@ param TotalTechnologyModelPeriodActivityLowerLimit{r in REGION, t in TECHNOLOGY}
 #
 #########			Reserve Margin				#############
 #
-param ReserveMarginTagTechnology{r in REGION, t in TECHNOLOGY, y in YEAR};
-param ReserveMarginTagFuel{r in REGION, f in FUEL, y in YEAR};
+param ReserveMarginTagTechnology{r in REGION, t in TECHNOLOGY, y in YEAR} >= 0 <= 1;
+param ReserveMarginTagFuel{r in REGION, f in FUEL, y in YEAR} binary;
 param ReserveMargin{r in REGION, y in YEAR};
 #
 #########			RE Generation Target		#############
 #
-param RETagTechnology{r in REGION, t in TECHNOLOGY, y in YEAR};
-param RETagFuel{r in REGION, f in FUEL, y in YEAR};
+param RETagTechnology{r in REGION, t in TECHNOLOGY, y in YEAR} binary;
+param RETagFuel{r in REGION, f in FUEL, y in YEAR} binary;
 param REMinProductionTarget{r in REGION, y in YEAR};
 #
 #########			Emissions & Penalties		#############
