@@ -1,0 +1,6 @@
+# OSeMOSYS files
+*.sol
+*.lp
+.vscode
+.pytest_cache
+.vscode
