@@ -3,12 +3,17 @@ BUILDDIR := osemosys_gnu_mathprog_$(VERSION)
 
 release: $(BUILDDIR).zip
 
-$(BUILDDIR).zip: model_files data_files $(BUILDDIR)/README.md $(BUILDDIR)/LICENSE
+$(BUILDDIR).zip: model_files data_files scripts $(BUILDDIR)/README.md $(BUILDDIR)/LICENSE
 	zip -r $(BUILDDIR).zip $(BUILDDIR)
 
 model_files: $(BUILDDIR)/osemosys.txt $(BUILDDIR)/osemosys_short.txt $(BUILDDIR)/osemosys_fast.txt
 
 data_files:	$(BUILDDIR)/simplicity.txt
+
+scripts: $(BUILDDIR)/scripts
+
+$(BUILDDIR)/scripts: $(BUILDDIR)
+	cp -R scripts $(BUILDDIR)/scripts
 
 $(BUILDDIR)/simplicity.txt:	$(BUILDDIR)
 	cp tests/simplicity.txt $(BUILDDIR)/simplicity.txt
