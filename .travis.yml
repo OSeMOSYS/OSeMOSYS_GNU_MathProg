@@ -9,7 +9,12 @@ install:
 - pip install pytest pandas
 script:
 - pytest tests
-before_deploy: make release && echo $TRAVIS_TAG
+before_deploy: 
+  - make release 
+  - echo $TRAVIS_TAG
+  - echo $TRAVIS_BUILD_DIR
+  - echo `ls "osemosys_gnu_mathprog_ + $TRAVIS_TAG + .zip"`
+  - echo "Release artifact " + osemosys_gnu_mathprog_ + $TRAVIS_TAG + .zip
 deploy:
   provider: releases
   tag_name: $TRAVIS_TAG
