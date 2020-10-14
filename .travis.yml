@@ -27,3 +27,5 @@ deploy:
   on:
     repo: OSeMOSYS/OSeMOSYS_GNU_MathProg
     tags: true
+notifications:
+  email: false
