@@ -1,4 +1,6 @@
 language: python
+dist: xenial
+os: linux
 python:
 - 3.7
 before_install:
@@ -10,10 +12,11 @@ script:
 before_deploy: make release && echo $TRAVIS_TAG
 deploy:
   provider: releases
-  edge: true
-  file: osemosys_gnu_mathprog_v + $TRAVIS_TAG + .zip
   draft: true
-  on:
-    tags: true
+  edge: true
   api_key:
-    secure: LK8xTgHr7QLjpYe8auL3yiUpAXUfgd3dW1NXMOvWF+qHUz3mPIex7qis3Pl7rlH/PMpX5G4W+xrYiG3dbji6K3sz7+HKfdpoWFzMgIQRLKZP21SFskNFyZ8kgRv7sHRkPxcOSEbpfDtrYN444wWSlBCb/z6TJ3j/webOV4XfaDLRrL6V/AGxzX50nupf5kbMVt5LRCkF1oU/6v1STMed971vIlEBFaAhy5WlctQh7AD2Rgak+gCAEp6mwwF+iW3sVIyGdzukqmrPJUyUDDi4r21sTp5An+rOwRfYHe4WBbA8nDAmSmUA1KhBCSPNZsf4P/LEt1XoVsHY/zh+eINCZEKP6cu+zZivvjHDPxHSu7OLgubj6BiQnQcBrEQx5fM3ve8NK/RowNxOnOhCOwVTUS2lT+GyozQxBRlArqtCAC1GNCVkHdrRlYVqMS9e05y9V28drshSCVAElAfnwF4p6keIh/lo11Yhh6p6ZlQPjwe09UVhlnBF3SGumiRFD9qfcdgnT6WByfLYTSfYlW3Gh7qU7N3CqSIELGJxxVrR7OU7jc+/rCDNkhBo0Vr8iBV0pS/zQ92Tl2Xbt2sm5xx4wLsUCyThiq1Zau6Y5Q7IL6VLG3eqDdIcQ0prIEYoeKFA86JXa5F44i8MKWaUyjvo0ic7C2/ZoJZ1sEbYUZoesZY=
+    secure: aZ/HJr7KB0z7s4PPjfy5et7i9cwIAoNNxnmZ7wFfr6etauId92UANaB1khH8+Yhd5WQaDBtzp9Zb/307CmwAy1X/T+Q9cv8jNmUfXhR6yhAfUbuExa02ApTSpqsyceyYVn5kdzUHldY3Hwr5bNIvmqXHlI1TrKi7Z7XJYTcZgNQMtZxd7NF7NOWzdsufoXhBSgbAA1wEBgfjCW3ljzOxZz98M8sIYgHfG8Zi1LjvsTG0cV/AlUtDTTIen9GaBI8KbMYYGQtzytVqFwob78jlkatKho34N0GdWkgHqDKJhhoWPwGKbU77kyfZggbccNHtJJPou3H56cO+1No7kIxgiY/j0JYjnUy7wUqxhmLpZvwJZY+IfV8fA/2y6wwH2P4EZEfHP1CFXjUAkN/WoGGybna/fXSRAD+YDBlTjXBrO627ig4svvE6Iea4ZqWNtUUM0alVdQ4J24If5wBZcebbl8hfBrhsLSGqhTxOmTAaK7Z0eAXW3kopQ6XUx4C6142qcixNGpLEJCSOx451UwI1M9Rw8wkt0Srv+6yjg7+rGHEq2jgPldK0PZuLEjPMLojc8tqaQ0oVcjK6LG1hRX5h/n7zS/h6KsCZ3+PycDEvipfkFuVNpDM0SwwA951LOxHoH2kmpqdjwaxPMw4vO1f6A7utSzH+OFn/SJFgyID95TU=
+  file: osemosys_gnu_mathprog_ + $TRAVIS_TAG + .zip
+  on:
+    repo: OSeMOSYS/OSeMOSYS_GNU_MathProg
+    tags: true
