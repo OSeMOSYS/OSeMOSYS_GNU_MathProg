@@ -2,6 +2,55 @@
 
 Thanks for using OSeMOSYS and welcome to the OSeMOSYS community.
 
+To use OSeMOSYS you will first need to install a few dependencies. Instructions for
+these are given below.
+
+## Running OSeMOSYS
+
+If you've followed the installation instructions below using conda, before running OSeMOSYS you'll
+need to activate your conda environment:
+
+    conda activate osemosys
+
+To run OSeMOSYS, first navigate to the folder containing your OSeMOSYS files.
+By default, OSeMOSYS results are written into the `results` directory. If this doesn't already exist,
+you'll want to create it:
+
+    mkdir results
+
+Now enter the following line into your command prompt:
+
+    glpsol -m osemosys.txt -d  simplicity.txt
+
+The results from the model run should be available in the `results` folder.
+
+### Short and Fast versions of the code
+
+Alternatively, you can run the "short" or "fast" versions of the OSeMOSYS code.
+These versions of the OSeMOSYS code produce the same results as the original version, but are written
+using a more concise form which condenses many of the equations. For larger models that are more
+computationally expensive, the short and fast versions will provide a significant performance boost.
+However, for development purposes, the original version of the OSeMOSYS code is much easier to understand. 
+
+    glpsol -m osemosys_short.txt -d  simplicity.txt
+    glpsol -m osemosys_fast.txt -d  simplicity.txt
+
+### Running using other solvers
+
+Running using CBC or CLP is a little more involved, as it requires two separate steps.
+First, an LP file is generated using glpsol:
+
+    glpsol -m osemosys_short.txt -d simplicity.txt --wlp simplicity.lp --check
+
+Then the LP file is passed to the CBC (or CLP) solver to produce a solution file:
+
+    cbc simplicity.lp solve -solu simplicity.sol
+
+The solution file is written out in a format that requires post-processing. We recommend using
+the open-source Python package **otoole** to do this for you:
+
+    otoole results cbc csv simplicity.sol results --input_datafile simplicity.txt
+
 ## Installation
 
 To use OSeMOSYS, you'll need to install the 
@@ -35,20 +84,11 @@ open-source solvers using conda:
 
     conda install -c conda-forge coincbc coin-or-clp
 
-## Running OSeMOSYS
-
-If you've followed the instructions above using conda, before running OSeMOSYS you'll
-need to activate your conda environment:
-
-    conda activate osemosys
-
-To run OSeMOSYS, first navigate to the folder containing your OSeMOSYS files, and enter the following line into your command prompt:
-
-    glpsol -m osemosys.txt -d  simplicity.txt
-
-The results from the model run should be available in the `results` folder.
-
 ## Where to get help
+
+### OSeMOSYS Documentation
+
+You can read the [OSeMOSYS documentation online](https://osemosys.readthedocs.io/en/latest/?badge=latest).
 
 ### Forum
 

@@ -4,21 +4,19 @@ os: linux
 python:
 - 3.7
 before_install:
-- sudo apt-get install -y glpk-utils libglpk-dev coinor-cbc
+- sudo apt-get install -y glpk-utils libglpk-dev coinor-cbc pandoc
 install:
 - pip install pytest pandas
 script:
 - pytest tests
 before_deploy: 
   - make release 
-  - echo $TRAVIS_TAG
-  - echo $TRAVIS_BUILD_DIR
-  - echo `ls osemosys_gnu_mathprog_$TRAVIS_TAG.zip`
-  - echo "Release artifact "osemosys_gnu_mathprog_$TRAVIS_TAG.zip
+  - . pre-release.sh
 deploy:
   provider: releases
   tag_name: $TRAVIS_TAG
   name: $TRAVIS_TAG
+  prerelease: $prerelease
   draft: true
   edge: true
   cleanup: false

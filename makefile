@@ -3,7 +3,7 @@ BUILDDIR := osemosys_gnu_mathprog_$(VERSION)
 
 release: $(BUILDDIR).zip
 
-$(BUILDDIR).zip: model_files data_files scripts $(BUILDDIR)/README.md $(BUILDDIR)/LICENSE
+$(BUILDDIR).zip: model_files data_files scripts $(BUILDDIR)/README.html $(BUILDDIR)/LICENSE
 	zip -r $(BUILDDIR).zip $(BUILDDIR)
 
 model_files: $(BUILDDIR)/osemosys.txt $(BUILDDIR)/osemosys_short.txt $(BUILDDIR)/osemosys_fast.txt
@@ -27,8 +27,8 @@ $(BUILDDIR)/osemosys_short.txt: $(BUILDDIR)
 $(BUILDDIR)/osemosys_fast.txt: $(BUILDDIR)
 	cp src/osemosys_fast.txt $(BUILDDIR)/osemosys_fast.txt
 
-$(BUILDDIR)/README.md: $(BUILDDIR)
-	cp src/README.md $(BUILDDIR)/README.md
+$(BUILDDIR)/README.html: $(BUILDDIR)
+	pandoc -f markdown -t html src/README.md -o $(BUILDDIR)/README.html
 
 $(BUILDDIR)/LICENSE: $(BUILDDIR)
 	cp LICENSE $(BUILDDIR)/LICENSE
@@ -36,7 +36,7 @@ $(BUILDDIR)/LICENSE: $(BUILDDIR)
 $(BUILDDIR):
 	mkdir -p "$(BUILDDIR)"
 
-.PHONY: clean release migrations all
+.PHONY: clean release all
 all: release
 clean:
 	rm -f $(BUILDDIR).zip
