@@ -11,12 +11,12 @@ script:
 - pytest tests
 before_deploy: 
   - make release 
-  - . pre-release.sh $TRAVIS_TAG
+  # - . pre-release.sh $TRAVIS_TAG
 deploy:
   provider: releases
   tag_name: $TRAVIS_TAG
   name: $TRAVIS_TAG
-  prerelease: $prerelease
+  # prerelease: $prerelease
   draft: true
   edge: true
   cleanup: false
