@@ -1,5 +1,7 @@
 # OSeMOSYS GNU MathProg
 
+Thanks for using OSeMOSYS and welcome to the OSeMOSYS community.
+
 To run OSeMOSYS, enter the following line into your command prompt and
 data file name:
 
@@ -40,3 +42,46 @@ using the command `pytest`.
 
 Each of the tests in the `tests` folder runs an OSeMOSYS model file and checks that
 the output matches a given value.
+
+## Developers - Creating a new release and deploying to Github Releases
+
+Creating a new release for OSeMOSYS GNU MathProg is as simple as creating a new semver
+compliant tag and pushing the tag to a branch.  Travis CI will then run the tests, and 
+if they pass, create the package using the `makefile` found in the root of the repository.
+The makefile includes the contents of the `src` and `scripts` folders, an html render of 
+`src/README.md` and then zips them up deploying them to Github Releases and providing 
+the contents of `docs/changelog.md` as a release description.
+
+### 1. Update the changelog
+
+Add a new heading with the version number you will use and include a description 
+of the changes since the last release.
+
+It can be useful to view the log of git commits since the previous release using the 
+following command:
+
+    git log <yourlasttag>..HEAD
+
+### 2. Run the tests locally
+
+Follow the instructions provided to run the tests.
+
+### 3. Create a new tag and push to Github
+
+Create a new annotated tag:
+
+    git tag -a v1.0.0 -m "A descriptive message for the release"
+
+Please follow the Semantic Versioning [guidelines](https://semver.org/).
+To create an alpha or beta release (pre-release) you would do the following:
+
+    git tag -a v1.0.0-alpha.1 -m "An alpha release"
+    git tag -a v1.0.0-beta.1 -m "An beta release"
+    git tag -a v1.0.0 -m "First stable official release!"
+
+### 4. Check that the package is deployed successfully
+
+You can follow the release process at the 
+[Travis CI service](https://travis-ci.com/github/OSeMOSYS/OSeMOSYS_GNU_MathProg/branches).
+
+Finally, check that the release appears on the [Github Releases page](https://github.com/OSeMOSYS/OSeMOSYS_GNU_MathProg/releases).
