@@ -156,7 +156,7 @@ param ModelPeriodEmissionLimit{r in REGION, e in EMISSION};
 ##### 'Capacity investment' check  #####
 printf "Checking Max and Min capcity-investment bounds for r in REGION, t in TECHNOLOGY, y in YEAR \n";
 #
-check{r in REGION, t in TECHNOLOGY, y in YEAR:TotalAnnualMaxCapacityInvestment[r, t, y]<>0 && TotalAnnualMinCapacityInvestment[r, t, y]<>0}: TotalAnnualMaxCapacityInvestment[r, t, y]>=TotalAnnualMinCapacityInvestment[r, t, y];
+check{r in REGION, t in TECHNOLOGY, y in YEAR:TotalAnnualMaxCapacityInvestment[r, t, y]<>-1 && TotalAnnualMinCapacityInvestment[r, t, y]<>0}: TotalAnnualMaxCapacityInvestment[r, t, y]>=TotalAnnualMinCapacityInvestment[r, t, y];
 #
 ##### 'Annual Activity' check  #####
 printf "Checking Annual activity limits for r in REGION, t in TECHNOLOGY, y in YEAR \n";
