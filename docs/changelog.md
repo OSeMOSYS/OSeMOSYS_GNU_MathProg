@@ -2,9 +2,55 @@
 
 ## Version 1.0.0
 
+This is the first stable version of OSeMOSYS to be reduced using the Semantic Versioning pattern
+of numbering. You can read more about semver [here](https://semver.org/).
+
+### Multiple alternative versions of OSeMOSYS
+
+Three implementations of OSeMOSYS nicknamed the **long**, the **short** and **fast** versions
+of the code are included. All three take the same input parameters, and produce the same
+set of results.
+
+The **long** version is best for teaching, learning and developing extensions to the code.
+The formulation almost exactly matches the original description of the mathematical formulation
+in the 2011 paper.
+
+The **short** version is best for stable and accelerated performance. It reduces the size of the
+matrix produced through removing intermediate decision variables and combining equations. 
+The resultant increase in performance comes at the cost of reduced ease of debugging. 
+However, this allows larger models to be solved, and reduces solution time.
+
+The **fast** is highest performance, but very terse and uses a number of more complicated tricks to
+reduce the size of the matrix and thus increase performance. The fast version is not yet fully
+tested and should be considered experimental.
+
+### Numerous smaller performance improvements
+
+A number of small performance improvements have been included, reducing the problem size by
+implementing conditional operators.
+
+### Reintroduced technology specific discount rate
+
+The `DiscountRate` parameter has been replaced with one containing a technology index 
+`DiscountRate[r,t]` and a new parameter for storage has been added `DiscountRateStorage[r,s]`.
+
+### OSeMOSYS checks for basic errors in input data
+
+- Thanks to @vignesh1987 for providing check statements for 
+    - `Capacity investment`
+    - `Annual Activity`
+    - `Total capacity`
+    - `Minimum Annual activity`
+    - `Time Slice`
+    - `Model period activity limit`
+
+These raise an error if incompatible or incorrect data is presented to the 
+model prior to attempting a solve step. This saves time, and avoids many
+infeasible solutions due to data errors.
+
 ### Folder of CSV result parameters added
 
-- Results parameters are written out into individual files in long format.
+- Results parameters are written out into individual CSV files in long format.
 - Headers correspond to the index of the variable, e.g. `REGION,FUEL,VALUE`
 
 ### Adds ResultPath parameter to choose location of results
