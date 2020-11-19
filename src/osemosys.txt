@@ -81,6 +81,7 @@ param DepreciationMethod{r in REGION};
 param SpecifiedAnnualDemand{r in REGION, f in FUEL, y in YEAR};
 param SpecifiedDemandProfile{r in REGION, f in FUEL, l in TIMESLICE, y in YEAR};
 param AccumulatedAnnualDemand{r in REGION, f in FUEL, y in YEAR};
+param AnnualPeakHour{r in Region, y in YEAR};
 #
 #########			Performance					#############
 #
@@ -276,7 +277,7 @@ var ModelPeriodCostByRegion{r in REGION} >= 0;
 #########			Reserve Margin				#############
 #
 var TotalCapacityInReserveMargin{r in REGION, y in YEAR}>= 0;
-var DemandNeedingReserveMargin{r in REGION,l in TIMESLICE, y in YEAR}>= 0;
+#var DemandNeedingReserveMargin{r in REGION,l in TIMESLICE, y in YEAR}>= 0;
 #
 #########			RE Gen Target				#############
 #
@@ -631,14 +632,10 @@ s.t. RM1_ReserveMargin_TechnologiesIncluded_In_Activity_Units{r in REGION, l in 
 	=
 	TotalCapacityInReserveMargin[r,y];
 
-s.t. RM2_ReserveMargin_FuelsIncluded{r in REGION, l in TIMESLICE, y in YEAR: ReserveMargin[r,y] > 0}:
-	sum {f in FUEL}
-	RateOfProduction[r,l,f,y] * ReserveMarginTagFuel[r,f,y]
-	=
-	DemandNeedingReserveMargin[r,l,y];
+#s.t. RM2_ReserveMargin_FuelsIncluded{r in REGION, l in TIMESLICE, y in YEAR: ReserveMargin[r,y] > 0}:	sum {f in FUEL}	RateOfProduction[r,l,f,y] * ReserveMarginTagFuel[r,f,y]	=	DemandNeedingReserveMargin[r,l,y];
 
 s.t. RM3_ReserveMargin_Constraint{r in REGION, l in TIMESLICE, y in YEAR: ReserveMargin[r,y] > 0}:
-	DemandNeedingReserveMargin[r,l,y] * ReserveMargin[r,y]
+	AnnualPeakHour[r,y] * ReserveMargin[r,y]
 	<=
 	TotalCapacityInReserveMargin[r,y];
 
