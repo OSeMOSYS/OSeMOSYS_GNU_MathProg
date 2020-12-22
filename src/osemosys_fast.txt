@@ -81,7 +81,7 @@ param DepreciationMethod{r in REGION};
 param SpecifiedAnnualDemand{r in REGION, f in FUEL, y in YEAR};
 param SpecifiedDemandProfile{r in REGION, f in FUEL, l in TIMESLICE, y in YEAR};
 param AccumulatedAnnualDemand{r in REGION, f in FUEL, y in YEAR};
-param AnnualPeakHour{r in Region, y in YEAR};
+param AnnualPeakHour{r in REGION, y in YEAR};
 #
 #########                        Performance                                        #############
 #
