@@ -56,11 +56,18 @@ set STORAGE;
 param ResultsPath, symbolic default 'results';
 param YearSplit{l in TIMESLICE, y in YEAR};
 
-param DiscountRate{r in REGION, t in TECHNOLOGY};
-param CapitalRecoveryFactor{r in REGION, t in TECHNOLOGY, y in YEAR} :=
-	(1 + DiscountRate[r, t]) ^ (y - min{yy in YEAR} min(yy) + 0.0);
-param CapitalRecoveryFactorMid{r in REGION, t in TECHNOLOGY, y in YEAR} :=
-	(1 + DiscountRate[r, t]) ^ (y - min{yy in YEAR} min(yy) + 0.5);
+param DiscountRate{r in REGION};
+param DiscountRateIdv{r in REGION, t in TECHNOLOGY};
+
+param CapitalRecoveryFactor{r in REGION, y in YEAR} :=
+	(1 + DiscountRate[r]) ^ (y - min{yy in YEAR} min(yy) + 0.0);
+param CapitalRecoveryFactorMid{r in REGION, y in YEAR} :=
+	(1 + DiscountRate[r]) ^ (y - min{yy in YEAR} min(yy) + 0.5);
+
+param OperationalLife{r in REGION, t in TECHNOLOGY};
+
+param CapitalRecoveryFactorIdv{r in REGION, t in TECHNOLOGY, y in YEAR} :=  
+	(DiscountRateIdv[r,t] / (1 - (1 + DiscountRateIdv[r,t])^(-(OperationalLife[r,t])))) * ((1 - (1 + DiscountRateIdv[r,t])^(-(OperationalLife[r,t]))) * (1 + DiscountRateIdv[r,t]) / DiscountRateIdv[r,t]) / ((1 + DiscountRate[r]) ^ (y - min{yy in YEAR} min(yy) + 0.0));
 
 param DiscountRateStorage{r in REGION, s in STORAGE};
 param CapitalRecoveryFactorStorage{r in REGION, s in STORAGE, y in YEAR} :=
@@ -75,6 +82,8 @@ param Conversionlh{l in TIMESLICE, lh in DAILYTIMEBRACKET} binary;
 param DaysInDayType{ls in SEASON, ld in DAYTYPE, y in YEAR};
 param TradeRoute {r in REGION, rr in REGION, f in FUEL, y in YEAR} binary;
 param DepreciationMethod{r in REGION};
+param TypeOfDiscountRate{r in REGION};
+
 #
 ########			Demands 					#############
 #
@@ -87,7 +96,7 @@ param AccumulatedAnnualDemand{r in REGION, f in FUEL, y in YEAR};
 param CapacityToActivityUnit{r in REGION, t in TECHNOLOGY};
 param CapacityFactor{r in REGION, t in TECHNOLOGY, l in TIMESLICE, y in YEAR};
 param AvailabilityFactor{r in REGION, t in TECHNOLOGY, y in YEAR};
-param OperationalLife{r in REGION, t in TECHNOLOGY};
+
 param ResidualCapacity{r in REGION, t in TECHNOLOGY, y in YEAR};
 param InputActivityRatio{r in REGION, t in TECHNOLOGY, f in FUEL, m in MODE_OF_OPERATION, y in YEAR};
 param OutputActivityRatio{r in REGION, t in TECHNOLOGY, f in FUEL, m in MODE_OF_OPERATION, y in YEAR};
@@ -562,14 +571,17 @@ s.t. SI10_TotalDiscountedCostByStorage{r in REGION, s in STORAGE, y in YEAR}: Di
 #########       	Capital Costs 		     	#############
 #
 s.t. CC1_UndiscountedCapitalInvestment{r in REGION, t in TECHNOLOGY, y in YEAR}: CapitalCost[r,t,y] * NewCapacity[r,t,y] = CapitalInvestment[r,t,y];
-s.t. CC2_DiscountingCapitalInvestment{r in REGION, t in TECHNOLOGY, y in YEAR}: CapitalInvestment[r,t,y]/(CapitalRecoveryFactor[r,t,y]) = DiscountedCapitalInvestment[r,t,y];
+
+s.t. CC2_DiscountingCapitalInvestment{r in REGION, t in TECHNOLOGY, y in YEAR: TypeOfDiscountRate[r]=1}: CapitalInvestment[r,t,y]/(CapitalRecoveryFactor[r,y]) = DiscountedCapitalInvestment[r,t,y];
+
+s.t. CC3_DiscountingCapitalInvestment{r in REGION, t in TECHNOLOGY, y in YEAR: TypeOfDiscountRate[r]=2}: CapitalInvestment[r,t,y]*(CapitalRecoveryFactorIdv[r,t,y]) = DiscountedCapitalInvestment[r,t,y];
 #
 #########           Salvage Value            	#############
 #
-s.t. SV1_SalvageValueAtEndOfPeriod1{r in REGION, t in TECHNOLOGY, y in YEAR: DepreciationMethod[r]=1 && (y + OperationalLife[r,t]-1) > (max{yy in YEAR} max(yy)) && DiscountRate[r,t]>0}: SalvageValue[r,t,y] = CapitalCost[r,t,y]*NewCapacity[r,t,y]*(1-(((1+DiscountRate[r,t])^(max{yy in YEAR} max(yy) - y+1)-1)/((1+DiscountRate[r,t])^OperationalLife[r,t]-1)));
-s.t. SV2_SalvageValueAtEndOfPeriod2{r in REGION, t in TECHNOLOGY, y in YEAR: (DepreciationMethod[r]=1 && (y + OperationalLife[r,t]-1) > (max{yy in YEAR} max(yy)) && DiscountRate[r,t]=0) || (DepreciationMethod[r]=2 && (y + OperationalLife[r,t]-1) > (max{yy in YEAR} max(yy)))}: SalvageValue[r,t,y] = CapitalCost[r,t,y]*NewCapacity[r,t,y]*(1-(max{yy in YEAR} max(yy) - y+1)/OperationalLife[r,t]);
+s.t. SV1_SalvageValueAtEndOfPeriod1{r in REGION, t in TECHNOLOGY, y in YEAR: DepreciationMethod[r]=1 && (y + OperationalLife[r,t]-1) > (max{yy in YEAR} max(yy)) && DiscountRate[r]>0}: SalvageValue[r,t,y] = CapitalCost[r,t,y]*NewCapacity[r,t,y]*(1-(((1+DiscountRate[r])^(max{yy in YEAR} max(yy) - y+1)-1)/((1+DiscountRate[r])^OperationalLife[r,t]-1)));
+s.t. SV2_SalvageValueAtEndOfPeriod2{r in REGION, t in TECHNOLOGY, y in YEAR: (DepreciationMethod[r]=1 && (y + OperationalLife[r,t]-1) > (max{yy in YEAR} max(yy)) && DiscountRate[r]=0) || (DepreciationMethod[r]=2 && (y + OperationalLife[r,t]-1) > (max{yy in YEAR} max(yy)))}: SalvageValue[r,t,y] = CapitalCost[r,t,y]*NewCapacity[r,t,y]*(1-(max{yy in YEAR} max(yy) - y+1)/OperationalLife[r,t]);
 s.t. SV3_SalvageValueAtEndOfPeriod3{r in REGION, t in TECHNOLOGY, y in YEAR: (y + OperationalLife[r,t]-1) <= (max{yy in YEAR} max(yy))}: SalvageValue[r,t,y] = 0;
-s.t. SV4_SalvageValueDiscountedToStartYear{r in REGION, t in TECHNOLOGY, y in YEAR}: DiscountedSalvageValue[r,t,y] = SalvageValue[r,t,y]/((1+DiscountRate[r,t])^(1+max{yy in YEAR} max(yy)-min{yy in YEAR} min(yy)));
+s.t. SV4_SalvageValueDiscountedToStartYear{r in REGION, t in TECHNOLOGY, y in YEAR}: DiscountedSalvageValue[r,t,y] = SalvageValue[r,t,y]/((1+DiscountRate[r])^(1+max{yy in YEAR} max(yy)-min{yy in YEAR} min(yy)));
 #
 #########        	Operating Costs 		 	#############
 #
@@ -591,7 +603,7 @@ s.t. OC3_OperatingCostsTotalAnnual{r in REGION, t in TECHNOLOGY, y in YEAR}:
 	OperatingCost[r,t,y];
 
 s.t. OC4_DiscountedOperatingCostsTotalAnnual{r in REGION, t in TECHNOLOGY, y in YEAR}:
-	OperatingCost[r,t,y] / CapitalRecoveryFactorMid[r, t, y]
+	OperatingCost[r,t,y] / CapitalRecoveryFactorMid[r, y]
 	=
 	DiscountedOperatingCost[r,t,y];
   
@@ -676,7 +688,7 @@ s.t. E4_EmissionsPenaltyByTechnology{r in REGION, t in TECHNOLOGY, y in YEAR}:
 	AnnualTechnologyEmissionsPenalty[r,t,y];
 
 s.t. E5_DiscountedEmissionsPenaltyByTechnology{r in REGION, t in TECHNOLOGY, y in YEAR}:
-	AnnualTechnologyEmissionsPenalty[r,t,y] / CapitalRecoveryFactorMid[r,t,y]
+	AnnualTechnologyEmissionsPenalty[r,t,y] / CapitalRecoveryFactorMid[r,y]
 	=
 	DiscountedTechnologyEmissionsPenalty[r,t,y];
 
@@ -734,7 +746,7 @@ for {r in REGION}         {
                                         }
 printf "\n" >> ResultsPath & "/SelectedResults.csv";
 printf "Cost" >> ResultsPath & "/SelectedResults.csv";
-for {r in REGION} {printf ",%g", sum{t in TECHNOLOGY, y in YEAR}(((((sum{yy in YEAR: y-yy < OperationalLife[r,t] && y-yy>=0} NewCapacity[r,t,yy])+ ResidualCapacity[r,t,y])*FixedCost[r,t,y] + sum{m in MODE_OF_OPERATION, l in TIMESLICE} RateOfActivity[r,l,t,m,y]*YearSplit[l,y]*VariableCost[r,t,m,y])/CapitalRecoveryFactorMid[r,t,y]+CapitalCost[r,t,y] * NewCapacity[r,t,y]/(CapitalRecoveryFactor[r,t,y])+DiscountedTechnologyEmissionsPenalty[r,t,y]-DiscountedSalvageValue[r,t,y]) + sum{s in STORAGE} (CapitalCostStorage[r,s,y] * NewStorageCapacity[r,s,y]/CapitalRecoveryFactor[r,t,y]-CapitalCostStorage[r,s,y] * NewStorageCapacity[r,s,y]/CapitalRecoveryFactor[r,t,y])) >> ResultsPath & "/SelectedResults.csv";
+for {r in REGION} {printf ",%g", sum{t in TECHNOLOGY, y in YEAR}(((((sum{yy in YEAR: y-yy < OperationalLife[r,t] && y-yy>=0} NewCapacity[r,t,yy])+ ResidualCapacity[r,t,y])*FixedCost[r,t,y] + sum{m in MODE_OF_OPERATION, l in TIMESLICE} RateOfActivity[r,l,t,m,y]*YearSplit[l,y]*VariableCost[r,t,m,y])/CapitalRecoveryFactorMid[r,y]+CapitalCost[r,t,y] * NewCapacity[r,t,y]/(CapitalRecoveryFactor[r,y])+DiscountedTechnologyEmissionsPenalty[r,t,y]-DiscountedSalvageValue[r,t,y]) + sum{s in STORAGE} (CapitalCostStorage[r,s,y] * NewStorageCapacity[r,s,y]/CapitalRecoveryFactor[r,y]-CapitalCostStorage[r,s,y] * NewStorageCapacity[r,s,y]/CapitalRecoveryFactor[r,y])) >> ResultsPath & "/SelectedResults.csv";
 }
 printf "\n" >> ResultsPath & "/SelectedResults.csv";
 #
