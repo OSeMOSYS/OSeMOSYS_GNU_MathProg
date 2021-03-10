@@ -62,10 +62,6 @@ param DiscountFactor{r in REGION, y in YEAR} :=
 param DiscountFactorMid{r in REGION, y in YEAR} :=
 	(1 + DiscountRate[r]) ^ (y - min{yy in YEAR} min(yy) + 0.5);
 param OperationalLife{r in REGION, t in TECHNOLOGY};
-param DiscountFactorIdv{r in REGION, t in TECHNOLOGY, y in YEAR} :=  
-	(DiscountRateIdv[r,t] / (1 - (1 + DiscountRateIdv[r,t])^(-(OperationalLife[r,t])))) * ((1 - (1 + DiscountRateIdv[r,t])^(-(OperationalLife[r,t]))) * (1 + DiscountRateIdv[r,t]) / DiscountRateIdv[r,t]) / ((1 + DiscountRate[r]) ^ (y - min{yy in YEAR} min(yy) + 0.0));
-
-
 
 param DiscountRateStorage{r in REGION, s in STORAGE};
 param DiscountFactorStorage{r in REGION, s in STORAGE, y in YEAR} :=
@@ -78,7 +74,7 @@ param Conversionlh{l in TIMESLICE, lh in DAILYTIMEBRACKET} binary;
 param DaysInDayType{ls in SEASON, ld in DAYTYPE, y in YEAR};
 param TradeRoute {r in REGION, rr in REGION, f in FUEL, y in YEAR} binary;
 param DepreciationMethod{r in REGION};
-param TypeOfDiscountRate{r in REGION}, in 0..1;
+
 #
 ########                        Demands                                         #############
 #
@@ -421,8 +417,8 @@ s.t. SI8_SalvageValueStorageAtEndOfPeriod3{r in REGION, s in STORAGE, y in YEAR:
 #########               Capital Costs                              #############
 #
 s.t. CC1_UndiscountedCapitalInvestment{r in REGION, t in TECHNOLOGY, y in YEAR}: CapitalCost[r,t,y] * NewCapacity[r,t,y] = CapitalInvestment[r,t,y];
-s.t. CC2_DiscountingCapitalInvestment{r in REGION, t in TECHNOLOGY, y in YEAR: TypeOfDiscountRate[r]=0}: CapitalInvestment[r,t,y]/(DiscountFactor[r,y]) = DiscountedCapitalInvestment[r,t,y];
-s.t. CC3_DiscountingCapitalInvestment{r in REGION, t in TECHNOLOGY, y in YEAR: TypeOfDiscountRate[r]=1}: CapitalInvestment[r,t,y]*(DiscountFactorIdv[r,t,y]) = DiscountedCapitalInvestment[r,t,y];
+s.t. CC2_DiscountingCapitalInvestment{r in REGION, t in TECHNOLOGY, y in YEAR}:
+CapitalInvestment[r,t,y]*(1 + DiscountRateIdv[r,t])/(DiscountFactor[r,y]) = DiscountedCapitalInvestment[r,t,y];
 #
 #########           Salvage Value                    #############
 #
