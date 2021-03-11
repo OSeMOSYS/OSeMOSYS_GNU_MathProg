@@ -69,6 +69,9 @@ param DiscountFactorMid{r in REGION, y in YEAR} :=
 
 param OperationalLife{r in REGION, t in TECHNOLOGY};
 
+param AnnuityFactor{r in REGION, t in TECHNOLOGY} :=  
+	(1 + DiscountRateIdv[r,t]);
+
 param DiscountRateStorage{r in REGION, s in STORAGE};
 param DiscountFactorStorage{r in REGION, s in STORAGE, y in YEAR} :=
 	(1 + DiscountRateStorage[r, s]) ^ (y - min{yy in YEAR} min(yy) + 0.0);
@@ -625,7 +628,7 @@ s.t. SI10_TotalDiscountedCostByStorage{r in REGION, s in STORAGE, y in YEAR}: Di
 #
 s.t. CC1_UndiscountedCapitalInvestment{r in REGION, t in TECHNOLOGY, y in YEAR}: CapitalCost[r,t,y] * NewCapacity[r,t,y] = CapitalInvestment[r,t,y];
 
-s.t. CC2_DiscountingCapitalInvestment{r in REGION, t in TECHNOLOGY, y in YEAR}: CapitalInvestment[r,t,y]*(1 + DiscountRateIdv[r,t])/(DiscountFactor[r,y]) = DiscountedCapitalInvestment[r,t,y];
+s.t. CC2_DiscountingCapitalInvestment{r in REGION, t in TECHNOLOGY, y in YEAR}: CapitalInvestment[r,t,y]*AnnuityFactor[r,t] / (DiscountFactor[r,y]) = DiscountedCapitalInvestment[r,t,y];
 
 
 #
