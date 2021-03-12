@@ -60,7 +60,7 @@ param ResultsPath, symbolic default 'results';
 param YearSplit{l in TIMESLICE, y in YEAR};
 
 param DiscountRate{r in REGION};
-param DiscountRateIdv{r in REGION, t in TECHNOLOGY};
+param DiscountRateIdv{r in REGION, t in TECHNOLOGY} default DiscountRate{r in REGION};
 
 param DiscountFactor{r in REGION, y in YEAR} :=
 	(1 + DiscountRate[r]) ^ (y - min{yy in YEAR} min(yy) + 0.0);
@@ -69,8 +69,10 @@ param DiscountFactorMid{r in REGION, y in YEAR} :=
 
 param OperationalLife{r in REGION, t in TECHNOLOGY};
 
-param AnnuityFactor{r in REGION, t in TECHNOLOGY} :=  
-	(1 + DiscountRateIdv[r,t]);
+param CapitalRecoveryFactor{r in REGION, t in TECHNOLOGY} :=
+	(1 - (1 + DiscountRateIdv[r,t])^(-1))/(1 - (1 + DiscountRateIdv[r,t])^(-(OperationalLife[r,t])));
+param PvAnnuity{r in REGION, t in TECHNOLOGY} :=
+	(1 - (1 + DiscountRate[r])^(-(OperationalLife[r,t]))) * (1 + DiscountRate[r]) / DiscountRate[r];
 
 param DiscountRateStorage{r in REGION, s in STORAGE};
 param DiscountFactorStorage{r in REGION, s in STORAGE, y in YEAR} :=
@@ -628,7 +630,7 @@ s.t. SI10_TotalDiscountedCostByStorage{r in REGION, s in STORAGE, y in YEAR}: Di
 #
 s.t. CC1_UndiscountedCapitalInvestment{r in REGION, t in TECHNOLOGY, y in YEAR}: CapitalCost[r,t,y] * NewCapacity[r,t,y] = CapitalInvestment[r,t,y];
 
-s.t. CC2_DiscountingCapitalInvestment{r in REGION, t in TECHNOLOGY, y in YEAR}: CapitalInvestment[r,t,y]*AnnuityFactor[r,t] / (DiscountFactor[r,y]) = DiscountedCapitalInvestment[r,t,y];
+s.t. CC2_DiscountingCapitalInvestment{r in REGION, t in TECHNOLOGY, y in YEAR}: CapitalInvestment[r,t,y] * CapitalRecoveryFactor[r,t] * PvAnnuity[r,t] / DiscountFactor[r,y] = DiscountedCapitalInvestment[r,t,y];
 
 
 #
