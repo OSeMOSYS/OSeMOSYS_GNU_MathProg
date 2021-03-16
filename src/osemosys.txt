@@ -60,7 +60,7 @@ param ResultsPath, symbolic default 'results';
 param YearSplit{l in TIMESLICE, y in YEAR};
 
 param DiscountRate{r in REGION};
-param DiscountRateIdv{r in REGION, t in TECHNOLOGY};
+param DiscountRateIdv{r in REGION, t in TECHNOLOGY}, default DiscountRate[r];
 
 param DiscountFactor{r in REGION, y in YEAR} :=
 	(1 + DiscountRate[r]) ^ (y - min{yy in YEAR} min(yy) + 0.0);
