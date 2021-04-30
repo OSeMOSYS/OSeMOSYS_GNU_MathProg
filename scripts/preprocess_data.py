@@ -199,6 +199,7 @@ def main(data_format, data_infile, data_outfile):
 
                             data_out.append(tuple([fuel, tech, mode]))
                             output_table.append(tuple([tech, fuel, mode, year, value]))
+                            data_all.append(tuple([tech, mode]))
 
                         if param_current == 'InputActivityRatio':
                             tech = line.split(' ')[1].strip()
@@ -206,8 +207,7 @@ def main(data_format, data_infile, data_outfile):
                             mode = line.split(' ')[3].strip()
 
                             data_inp.append(tuple([fuel, tech, mode]))
-
-                        data_all.append(tuple([tech, mode]))
+                            data_all.append(tuple([tech, mode]))                        
 
                         if param_current == 'TechnologyToStorage':
                             tech = line.split(' ')[1].strip()
@@ -215,6 +215,7 @@ def main(data_format, data_infile, data_outfile):
                             mode = line.split(' ')[3].strip()
 
                             storage_to.append(tuple([storage, tech, mode]))
+                            data_all.append(tuple([storage, mode]))
 
                         if param_current == 'TechnologyFromStorage':
                             tech = line.split(' ')[1].strip()
@@ -222,6 +223,7 @@ def main(data_format, data_infile, data_outfile):
                             mode = line.split(' ')[3].strip()
 
                             storage_from.append(tuple([storage, tech, mode]))
+                            data_all.append(tuple([storage, mode]))
 
                         if param_current == 'EmissionActivityRatio':
                             tech = line.split(' ')[1].strip()
@@ -288,11 +290,11 @@ def main(data_format, data_infile, data_outfile):
         file_output_function(dict_inp, dict_inp, fuel_list, 'set MODExTECHNOLOGYperFUELin[', '')
         file_output_function(dict_all, dict_all, tech_list, 'set MODEperTECHNOLOGY[', '*')
 
-        if len(storage_list) > 1:
-            file_output_function(dict_stt, dict_out, storage_list, 'set MODExTECHNOLOGYperSTORAGEto[', '')
-            file_output_function(dict_stf, dict_out, storage_list, 'set MODExTECHNOLOGYperSTORAGEfrom[', '*')
+        if len(storage_list) > 0:
+            file_output_function(dict_stt, dict_stt, storage_list, 'set MODExTECHNOLOGYperSTORAGEto[', '')
+            file_output_function(dict_stf, dict_stf, storage_list, 'set MODExTECHNOLOGYperSTORAGEfrom[', '')
 
-        if len(emission_list) > 1:
+        if len(emission_list) > 0:
             file_output_function(dict_emi, dict_emi, emission_list, 'set MODExTECHNOLOGYperEMISSION[', '')
 
         file_out.write('end;')
