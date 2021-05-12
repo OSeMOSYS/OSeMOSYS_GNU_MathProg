@@ -284,7 +284,9 @@ def main(data_format, data_infile, data_outfile):
                     line = line.replace(',','').replace(':=[',':= ').replace(']*','').replace("'","")
                 else:
                     line = line.replace('),',')').replace('[(',' (').replace(')]',')').replace("'","")
-                file_out.write(line + ';' + '\n')
+            else:
+                line = set_name + str(each) + ']:='
+            file_out.write(line + ';' + '\n')
 
     # Append lines at the end of the data file
     with open(data_outfile, 'w') as file_out:  # 'a' to open in 'append' mode
