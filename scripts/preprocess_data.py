@@ -286,7 +286,7 @@ def main(data_format, data_infile, data_outfile):
                     line = line.replace('),',')').replace('[(',' (').replace(')]',')').replace("'","")
             else:
                 line = set_name + str(each) + ']:='
-            
+
             file_out.write(line + ';' + '\n')
 
     storage_list_len = {'otoole': 0,
@@ -302,7 +302,6 @@ def main(data_format, data_infile, data_outfile):
         file_output_function(dict_all, dict_all, tech_list, 'set MODEperTECHNOLOGY[', '*')
 
         if len(storage_list) > storage_list_len[data_format]:
-            print(len(storage_list))
             file_output_function(dict_stt, dict_stt, storage_list, 'set MODExTECHNOLOGYperSTORAGEto[', '')
             file_output_function(dict_stf, dict_stf, storage_list, 'set MODExTECHNOLOGYperSTORAGEfrom[', '')
 
