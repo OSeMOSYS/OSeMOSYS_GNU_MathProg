@@ -45,6 +45,7 @@ set SEASON;
 set DAYTYPE;
 set DAILYTIMEBRACKET;
 set STORAGE;
+set UDC;
 #
 #####################
 #    Parameters     #
@@ -154,6 +155,13 @@ param AnnualEmissionLimit{r in REGION, e in EMISSION, y in YEAR};
 param ModelPeriodExogenousEmission{r in REGION, e in EMISSION};
 param ModelPeriodEmissionLimit{r in REGION, e in EMISSION};
 #
+#########			User-defined constraints	#############
+#
+param UDCMultiplierTotalCapacity{r in REGION, t in TECHNOLOGY, u in UDC, y in YEAR};
+param UDCMultiplierNewCapacity{r in REGION, t in TECHNOLOGY, u in UDC, y in YEAR};
+param UDCMultiplierActivity{r in REGION, t in TECHNOLOGY, u in UDC, y in YEAR};
+param UDCConstant{r in REGION, u in UDC, y in YEAR};
+param UDCTag{r in REGION, u in UDC};
 #
 ##############
 ##
@@ -509,6 +517,23 @@ s.t. E9_ModelPeriodEmissionsLimit{r in REGION, e in EMISSION: ModelPeriodEmissio
 #s.t. E6_EmissionsAccounting1{r in REGION, e in EMISSION, y in YEAR}: sum{l in TIMESLICE, t in TECHNOLOGY, m in MODE_OF_OPERATION: EmissionActivityRatio[r,t,e,m,y]<>0} EmissionActivityRatio[r,t,e,m,y]*RateOfActivity[r,l,t,m,y]*YearSplit[l,y] = AnnualEmissions[r,e,y];
 #s.t. E7_EmissionsAccounting2{r in REGION, e in EMISSION}: sum{l in TIMESLICE, t in TECHNOLOGY, m in MODE_OF_OPERATION, y in YEAR: EmissionActivityRatio[r,t,e,m,y]<>0} EmissionActivityRatio[r,t,e,m,y]*RateOfActivity[r,l,t,m,y]*YearSplit[l,y] + ModelPeriodExogenousEmission[r,e] = ModelPeriodEmissions[r,e];
 #
+#
+#########		User-defined constraints		#########
+#
+s.t. UDC0_UserDefinedConstraintEquality{r in REGION, u in UDC, y in YEAR: UDCTag[r,u] = 0}: 
+sum{t in TECHNOLOGY}UDCMultiplierTotalCapacity[r,t,u,y]*((sum{yy in YEAR: y-yy < OperationalLife[r,t] && y-yy>=0} NewCapacity[r,t,yy])+ ResidualCapacity[r,t,y]) + 
+sum{t in TECHNOLOGY}UDCMultiplierNewCapacity[r,t,u,y]*NewCapacity[r,t,y] +
+sum{t in TECHNOLOGY}UDCMultiplierActivity[r,t,u,y]*sum{l in TIMESLICE, m in MODE_OF_OPERATION} RateOfActivity[r,l,t,m,y]*YearSplit[l,y] = UDCConstant[r,u,y];
+
+s.t. UDC1_UserDefinedConstraintInequality{r in REGION, u in UDC, y in YEAR: UDCTag[r,u] = 1}: 
+sum{t in TECHNOLOGY}UDCMultiplierTotalCapacity[r,t,u,y]*((sum{yy in YEAR: y-yy < OperationalLife[r,t] && y-yy>=0} NewCapacity[r,t,yy])+ ResidualCapacity[r,t,y]) + 
+sum{t in TECHNOLOGY}UDCMultiplierNewCapacity[r,t,u,y]*NewCapacity[r,t,y] +
+sum{t in TECHNOLOGY}UDCMultiplierActivity[r,t,u,y]*sum{l in TIMESLICE, m in MODE_OF_OPERATION} RateOfActivity[r,l,t,m,y]*YearSplit[l,y] >= UDCConstant[r,u,y];
+
+s.t. UDC2_UserDefinedConstraintInequality{r in REGION, u in UDC, y in YEAR: UDCTag[r,u] = 2}: 
+sum{t in TECHNOLOGY}UDCMultiplierTotalCapacity[r,t,u,y]*((sum{yy in YEAR: y-yy < OperationalLife[r,t] && y-yy>=0} NewCapacity[r,t,yy])+ ResidualCapacity[r,t,y]) + 
+sum{t in TECHNOLOGY}UDCMultiplierNewCapacity[r,t,u,y]*NewCapacity[r,t,y] +
+sum{t in TECHNOLOGY}UDCMultiplierActivity[r,t,u,y]*sum{l in TIMESLICE, m in MODE_OF_OPERATION} RateOfActivity[r,l,t,m,y]*YearSplit[l,y] <= UDCConstant[r,u,y];
 #
 ###########################################################################################
 # Try to write to ResultsPath BEFORE doing the (computationally expensive) solve
