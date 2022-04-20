@@ -240,7 +240,7 @@ def main(data_format, data_infile, data_outfile):
                                 data_all.append(tuple([tech, mode]))
 
                 if any(param in line for param in params_to_check):
-                    param_current = details[-2]
+                    param_current = details[1]
                     parsing = True
 
     data_out = list(set(data_out))
