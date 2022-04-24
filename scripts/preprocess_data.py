@@ -217,7 +217,7 @@ def main(data_format, data_infile, data_outfile):
                             storage = details[2].strip()
                             mode = details[3].strip()
                             value = details[4].strip()
-                            if value > 0.0:
+                            if float(value) > 0.0:
                                 storage_to.append(tuple([storage, tech, mode]))
                                 data_all.append(tuple([storage, mode]))
 
@@ -226,7 +226,7 @@ def main(data_format, data_infile, data_outfile):
                             storage = details[2].strip()
                             mode = details[3].strip()
                             value = details[4].strip()
-                            if value > 0.0:
+                            if float(value) > 0.0:
                                 storage_from.append(tuple([storage, tech, mode]))
                                 data_all.append(tuple([storage, mode]))
 
