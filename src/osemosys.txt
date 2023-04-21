@@ -86,7 +86,7 @@ param Conversionld{l in TIMESLICE, ld in DAYTYPE} binary;
 param Conversionlh{l in TIMESLICE, lh in DAILYTIMEBRACKET} binary;
 param DaysInDayType{ls in SEASON, ld in DAYTYPE, y in YEAR};
 param TradeRoute {r in REGION, rr in REGION, f in FUEL, y in YEAR} binary;
-param DepreciationMethod{r in REGION};
+param DepreciationMethod{r in REGION} integer;
 
 #
 ########			Demands 					#############
@@ -265,7 +265,7 @@ var UseByTechnologyAnnual{r in REGION, t in TECHNOLOGY, f in FUEL, y in YEAR}>= 
 var RateOfUse{r in REGION, l in TIMESLICE, f in FUEL, y in YEAR}>= 0;
 var UseByTechnology{r in REGION, l in TIMESLICE, t in TECHNOLOGY, f in FUEL, y in YEAR}>= 0;
 var Use{r in REGION, l in TIMESLICE, f in FUEL, y in YEAR}>= 0;
-var Trade{r in REGION, rr in REGION, l in TIMESLICE, f in FUEL, y in YEAR};
+var Trade{r in REGION, rr in REGION, l in TIMESLICE, f in FUEL, y in YEAR: r <> rr};
 var TradeAnnual{r in REGION, rr in REGION, f in FUEL, y in YEAR};
 #
 var ProductionAnnual{r in REGION, f in FUEL, y in YEAR}>= 0;
@@ -332,33 +332,11 @@ var DiscountedTechnologyEmissionsPenalty{r in REGION, t in TECHNOLOGY, y in YEAR
 var AnnualEmissions{r in REGION, e in EMISSION, y in YEAR}>=0;
 var ModelPeriodEmissions{r in REGION, e in EMISSION}>=0;
 
-
-
-
-
-#
-
-
-
 ######################
 # Objective Function #
 ######################
 #
 minimize cost: sum{r in REGION, y in YEAR} TotalDiscountedCost[r,y];
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 #
 #####################
@@ -420,10 +398,8 @@ s.t. EBa1_RateOfFuelProduction1{
 	=
 	RateOfProductionByTechnologyByMode[r,l,t,m,f,y];
 
-s.t. EBa2_RateOfFuelProduction2{r in REGION, l in TIMESLICE, f in FUEL, t in TECHNOLOGY, y in YEAR
-								# : (sum{m in MODE_OF_OPERATION} OutputActivityRatio[r,t,f,m,y]) <> 0
-								}:
-	sum{m in MODE_OF_OPERATION: OutputActivityRatio[r,t,f,m,y] <> 0} RateOfProductionByTechnologyByMode[r,l,t,m,f,y]
+s.t. EBa2_RateOfFuelProduction2{r in REGION, l in TIMESLICE, f in FUEL, t in TECHNOLOGY, y in YEAR: sum{m in MODE_OF_OPERATION} OutputActivityRatio[r,t,f,m,y] <> 0}:
+	sum{m in MODE_OF_OPERATION} RateOfProductionByTechnologyByMode[r,l,t,m,f,y]
 	=
 	RateOfProductionByTechnology[r,l,t,f,y];
 
@@ -471,7 +447,7 @@ s.t. EBa9_EnergyBalanceEachTS3{r in REGION, l in TIMESLICE, f in FUEL, y in YEAR
 	Demand[r,l,f,y];
 
 s.t. EBa10_EnergyBalanceEachTS4{r in REGION, rr in REGION, l in TIMESLICE, f in FUEL, y in YEAR:
-								TradeRoute[r,rr,f,y] <> 0}:
+								TradeRoute[r,rr,f,y] <> 0 && (r <> rr)}:
 	Trade[r,rr,l,f,y]
 	=
 	-Trade[rr,r,l,f,y];
@@ -479,7 +455,7 @@ s.t. EBa10_EnergyBalanceEachTS4{r in REGION, rr in REGION, l in TIMESLICE, f in 
 s.t. EBa11_EnergyBalanceEachTS5{r in REGION, l in TIMESLICE, f in FUEL, y in YEAR}:
 	Production[r,l,f,y]
 	>=
-	Demand[r,l,f,y] + Use[r,l,f,y] + sum{rr in REGION} Trade[r,rr,l,f,y] * TradeRoute[r,rr,f,y];
+	Demand[r,l,f,y] + Use[r,l,f,y] + sum{rr in REGION: r <> rr} Trade[r,rr,l,f,y] * TradeRoute[r,rr,f,y];
 
 #
 #########        	Energy Balance B		 	#############
@@ -494,7 +470,7 @@ s.t. EBb2_EnergyBalanceEachYear2{r in REGION, f in FUEL, y in YEAR}:
 	=
 	UseAnnual[r,f,y];
 
-s.t. EBb3_EnergyBalanceEachYear3{r in REGION, rr in REGION, f in FUEL, y in YEAR}:
+s.t. EBb3_EnergyBalanceEachYear3{r in REGION, rr in REGION, f in FUEL, y in YEAR: (r <> rr)}:
 	sum{l in TIMESLICE} Trade[r,rr,l,f,y]
 	=
 	TradeAnnual[r,rr,f,y];
@@ -507,12 +483,14 @@ s.t. EBb4_EnergyBalanceEachYear4{r in REGION, f in FUEL, y in YEAR}:
 #
 #########        	Accounting Technology Production/Use	#############
 #
-s.t. Acc1_FuelProductionByTechnology{r in REGION, l in TIMESLICE, t in TECHNOLOGY, f in FUEL, y in YEAR}:
+s.t. Acc1_FuelProductionByTechnology{r in REGION, l in TIMESLICE, t in TECHNOLOGY, f in FUEL, y in YEAR:
+	(sum{m in MODE_OF_OPERATION} OutputActivityRatio[r,t,f,m,y]) <> 0}:
 	RateOfProductionByTechnology[r,l,t,f,y] * YearSplit[l,y]
 	=
 	ProductionByTechnology[r,l,t,f,y];
 
-s.t. Acc2_FuelUseByTechnology{r in REGION, l in TIMESLICE, t in TECHNOLOGY, f in FUEL, y in YEAR}:
+s.t. Acc2_FuelUseByTechnology{r in REGION, l in TIMESLICE, t in TECHNOLOGY, f in FUEL, y in YEAR:
+	(sum{m in MODE_OF_OPERATION} InputActivityRatio[r,t,f,m,y]) <> 0}:
 	RateOfUseByTechnology[r,l,t,f,y] * YearSplit[l,y]
 	=
 	UseByTechnology[r,l,t,f,y];
@@ -676,9 +654,6 @@ s.t. TDC2_TotalDiscountedCost{r in REGION, y in YEAR}: sum{t in TECHNOLOGY} Tota
 #
 s.t. TCC1_TotalAnnualMaxCapacityConstraint{r in REGION, t in TECHNOLOGY, y in YEAR: TotalAnnualMaxCapacity[r,t,y] <> -1}: TotalCapacityAnnual[r,t,y] <= TotalAnnualMaxCapacity[r,t,y];
 
-
-
-
 s.t. TCC2_TotalAnnualMinCapacityConstraint{r in REGION, t in TECHNOLOGY, y in YEAR: TotalAnnualMinCapacity[r,t,y]>0}: TotalCapacityAnnual[r,t,y] >= TotalAnnualMinCapacity[r,t,y];
 #
 #########    		New Capacity Constraints  	##############
@@ -691,15 +666,6 @@ s.t. NCC2_TotalAnnualMinNewCapacityConstraint{r in REGION, t in TECHNOLOGY, y in
 #
 #########   		Annual Activity Constraints	##############
 
-
-
-
-
-
-
-
-
-
 #
 s.t. AAC1_TotalAnnualTechnologyActivity{r in REGION, t in TECHNOLOGY, y in YEAR}: sum{l in TIMESLICE} RateOfTotalActivity[r,t,l,y]*YearSplit[l,y] = TotalTechnologyAnnualActivity[r,t,y];
 s.t. AAC2_TotalAnnualTechnologyActivityUpperLimit{r in REGION, t in TECHNOLOGY, y in YEAR: TotalTechnologyAnnualActivityUpperLimit[r,t,y] <> -1}: TotalTechnologyAnnualActivity[r,t,y] <= TotalTechnologyAnnualActivityUpperLimit[r,t,y] ;
@@ -707,14 +673,12 @@ s.t. AAC3_TotalAnnualTechnologyActivityLowerLimit{r in REGION, t in TECHNOLOGY, 
 #
 #########    		Total Activity Constraints 	##############
 
-
 #
 s.t. TAC1_TotalModelHorizonTechnologyActivity{r in REGION, t in TECHNOLOGY}: sum{y in YEAR} TotalTechnologyAnnualActivity[r,t,y] = TotalTechnologyModelPeriodActivity[r,t];
 s.t. TAC2_TotalModelHorizonTechnologyActivityUpperLimit{r in REGION, t in TECHNOLOGY: TotalTechnologyModelPeriodActivityUpperLimit[r,t]<>-1}: TotalTechnologyModelPeriodActivity[r,t] <= TotalTechnologyModelPeriodActivityUpperLimit[r,t] ;
 s.t. TAC3_TotalModelHorizenTechnologyActivityLowerLimit{r in REGION, t in TECHNOLOGY: TotalTechnologyModelPeriodActivityLowerLimit[r,t]>0}: TotalTechnologyModelPeriodActivity[r,t] >= TotalTechnologyModelPeriodActivityLowerLimit[r,t] ;
 #
 #########   		Reserve Margin Constraint	############## NTS: Should change demand for production
-
 
 #
 s.t. RM1_ReserveMargin_TechnologiesIncluded_In_Activity_Units{r in REGION, l in TIMESLICE, y in YEAR: ReserveMargin[r,y] > 0}:
@@ -737,28 +701,16 @@ s.t. RM3_ReserveMargin_Constraint{r in REGION, l in TIMESLICE, y in YEAR: Reserv
 #
 #########   		RE Production Target		############## NTS: Should change demand for production
 
-
-
-
 #
 s.t. RE1_FuelProductionByTechnologyAnnual{r in REGION, t in TECHNOLOGY, f in FUEL, y in YEAR}: sum{l in TIMESLICE} ProductionByTechnology[r,l,t,f,y] = ProductionByTechnologyAnnual[r,t,f,y];
 s.t. RE2_TechIncluded{r in REGION, y in YEAR}: sum{t in TECHNOLOGY, f in FUEL} ProductionByTechnologyAnnual[r,t,f,y]*RETagTechnology[r,t,y] = TotalREProductionAnnual[r,y];
 s.t. RE3_FuelIncluded{r in REGION, y in YEAR}: sum{l in TIMESLICE, f in FUEL} RateOfProduction[r,l,f,y]*YearSplit[l,y]*RETagFuel[r,f,y] = RETotalProductionOfTargetFuelAnnual[r,y];
 s.t. RE4_EnergyConstraint{r in REGION, y in YEAR}:REMinProductionTarget[r,y]*RETotalProductionOfTargetFuelAnnual[r,y] <= TotalREProductionAnnual[r,y];
-s.t. RE5_FuelUseByTechnologyAnnual{r in REGION, t in TECHNOLOGY, f in FUEL, y in YEAR}: sum{l in TIMESLICE} RateOfUseByTechnology[r,l,t,f,y]*YearSplit[l,y] = UseByTechnologyAnnual[r,t,f,y];
+s.t. RE5_FuelUseByTechnologyAnnual{r in REGION, t in TECHNOLOGY, f in FUEL, y in YEAR: sum{m in MODE_OF_OPERATION} InputActivityRatio[r,t,f,m,y] > 0}:
+	sum{l in TIMESLICE}
+		RateOfUseByTechnology[r,l,t,f,y]*YearSplit[l,y] = UseByTechnologyAnnual[r,t,f,y];
 #
 #########   		Emissions Accounting		##############
-
-
-
-
-
-
-
-
-
-
-
 
 #
 s.t. E1_AnnualEmissionProductionByMode{r in REGION, t in TECHNOLOGY, e in EMISSION, m in MODE_OF_OPERATION, y in YEAR:
@@ -1404,7 +1356,7 @@ table TotalTechnologyModelPeriodActivityResults
 
 table TradeResults
 	{r in REGION, rr in REGION, l in TIMESLICE, f in FUEL, y in YEAR:
-		Trade[r, rr, l, f, y] <> 0}
+		(r <> rr) && (Trade[r, rr, l, f, y] <> 0) }
 
 	OUT "CSV"
 	ResultsPath & "/Trade.csv" :
