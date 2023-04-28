@@ -601,7 +601,7 @@ s.t. SV4_SalvageValueDiscountedToStartYear{r in REGION, t in TECHNOLOGY, y in YE
 #########        	Operating Costs 		 	#############
 #
 
-s.t. OC1_OperatingCostsVariable{r in REGION, t in TECHNOLOGY, l in TIMESLICE, y in YEAR: sum{m in MODE_OF_OPERATION} VariableCost[r,t,m,y] <> 0}:
+s.t. OC1_OperatingCostsVariable{r in REGION, t in TECHNOLOGY, y in YEAR: sum{m in MODE_OF_OPERATION} VariableCost[r,t,m,y] <> 0}:
 	sum{m in MODE_OF_OPERATION}
 	TotalAnnualTechnologyActivityByMode[r,t,m,y] * VariableCost[r,t,m,y]
 	=
