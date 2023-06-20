@@ -1,0 +1,149 @@
+cff-version: 1.2.0
+title: OSeMOSYS GNU MathProg
+message: >-
+  If you use this software, please cite it using the
+  metadata from this file.
+type: software
+authors:
+  - given-names: Mark
+    family-names: Howells
+    orcid: 'https://orcid.org/0000-0001-6419-4957'
+    affiliation: Loughborough University Department of Social Sciences
+  - family-names: Welsch
+    given-names: Manuel
+    affiliation: International Atomic Energy Agency
+  - family-names: Lefvert
+    given-names: Adrian
+    orcid: 'https://orcid.org/0000-0001-8587-4054'
+  - given-names: Constantinos
+    family-names: Taliotis
+    orcid: 'https://orcid.org/0000-0003-4022-5506'
+    affiliation: The Cyprus Institute
+  - given-names: Igor
+    family-names: Tatarewicz
+    affiliation: >-
+      Institute of Environmental Protection - National
+      Research Institute / National Centre for Emissions
+      Management (KOBiZE)
+  - given-names: Tom
+    family-names: Alfstad
+    affiliation: >-
+      United Nations Department of Economic and Social
+      Affairs
+  - given-names: Nawfal
+    family-names: Saadi
+    orcid: 'https://orcid.org/0000-0001-8923-7431'
+  - given-names: Francesco
+    family-names: Gardumi
+    orcid: 'https://orcid.org/0000-0001-8371-9325'
+    affiliation: KTH Royal Institute of Technology
+  - given-names: Vignesh
+    family-names: Sridharan
+    affiliation: KTH Royal Institute of Technology,
+    orcid: 'https://orcid.org/0000-0003-0764-2615'
+  - given-names: Agnese
+    family-names: Beltramo
+    affiliation: KTH Royal Institute of Technology,
+    orcid: 'https://orcid.org/0000-0001-6591-3028'
+  - given-names: Nandi
+    family-names: Moksnes
+    affiliation: KTH Royal Institute of Technology,
+    orcid: 'https://orcid.org/0000-0002-8641-564X'
+  - given-names: Taco
+    family-names: Niet
+    affiliation: Simon Fraser University,
+    orcid: 'https://orcid.org/0000-0003-0266-2705'
+  - given-names: Abhishek
+    family-names: Shivakumar
+    affiliation: United Nations Department of Economic and Social Affairs,
+    orcid: 'https://orcid.org/0000-0002-2535-4134'
+  - given-names: Roberto
+    family-names: Heredia Fonseca,
+    affiliation: KTH Royal Institute of Technology,
+    orcid: 'https://orcid.org/0000-0003-3947-8725'
+  - given-names: Will
+    family-names: Usher
+    affiliation: KTH Royal Institute of Technology,
+    orcid: 'https://orcid.org/0000-0001-9367-1791'
+  - given-names: Christoph
+    family-names: Muschner
+    affiliation: KTH Royal Institute of Technology,
+    orcid: 'https://orcid.org/0000-0001-8144-5260'
+identifiers:
+  - type: doi
+    value: 10.5281/zenodo.5255505
+    description: "This is the archived snapshot of version 0.8 of OSeMOSYS GNU MathProg"
+  - type: doi
+    value: 10.5281/zenodo.5255610
+    description: "This is the archived snapshot of version 0.8.1 of OSeMOSYS GNU MathProg"
+  - type: doi
+    value: 10.5281/zenodo.4778833
+    description: "This is the archived snapshot of version 1.0.1 of OSeMOSYS GNU MathProg"
+  - type: doi
+    value: 10.5281/zenodo.4778832
+    description: "This is the archived collections of all versions of OSeMOSYS GNU MathProg"
+repository-code: 'https://github.com/OSeMOSYS/OSeMOSYS_GNU_MathProg'
+url: 'http://www.osemosys.org/'
+repository: 'https://github.com/OSeMOSYS/OSeMOSYS'
+repository-artifact: 'https://zenodo.org/record/5255610'
+abstract: >-
+  OSeMOSYS - the Open Source energy MOdelling SYStem. This
+  source code repository contains the Apache-2.0 licensed
+  source code for the GNU MathProg implementation of the
+  model formulation.
+keywords:
+  - OSeMOSYS
+  - energy system model
+  - energy system optimisation model
+  - ESOM
+  - ESM
+  - energy system modelling
+license: Apache-2.0
+version: v1.0.1
+date-released: '2021-05-21'
+references:
+  - type: article
+    authors:
+    - given-names: Mark
+      family-names: Howells
+      orcid: 'https://orcid.org/0000-0001-6419-4957'
+      affiliation: Loughborough University Department of Social Sciences
+    - given-names: Holger
+      family-names: Rogner
+      affiliation: International Atomic Energy Agency
+    - given-names: Neil
+      family-names: Strachan
+      affiliation: University College London
+    - given-names: Charlie
+      family-names: Heaps
+      affiliation: Stockholm Environment Institute
+    - given-names: Hillard
+      family-names: Huntington
+      affiliation: Stanford University
+    - given-names: Socrates
+      family-names: Kypreos
+      affiliation: Paul Scherrer Institute
+    - given-names: Alison
+      family-names: Hughes
+      affiliation: University of Cape Town
+    - given-names: S.
+      family-names: Silveira
+    - given-names: Joe
+      family-names: Decarolis
+    - given-names: Morgan
+      family-names: Bazilian
+    - given-names: A.
+      family-names: Roehrl
+    doi: "10.1016/j.enpol.2011.06.033"
+    journal: "Energy Policy"
+    start: 5850 # First page number
+    end: 5870 # Last page number
+    title: "OSeMOSYS: The Open Source Energy Modeling System: An introduction to its ethos, structure and development"
+    volume: 39 # Volume number
+    issue: 10 # Issue number
+    year: 2011
+    keywords:
+      - Energy systems analysis
+      - Energy modeling
+      - Open source
+    abstract: "This paper discusses the design and development of the Open Source Energy Modeling System (OSeMOSYS). It describes the model’s formulation in terms of a ‘plain English’ description, algebraic formulation, implementation—in terms of its full source code, as well as a detailed description of the model inputs, parameters, and outputs. A key feature of the OSeMOSYS implementation is that it is contained in less than five pages of documented, easily accessible code. Other existing energy system models that do not have this emphasis on compactness and openness makes the barrier to entry by new users much higher, as well as making the addition of innovative new functionality very difficult. The paper begins by describing the rationale for the development of OSeMOSYS and its structure. The current preliminary implementation of the model is then demonstrated for a discrete example. Next, we explain how new development efforts will build on the existing OSeMOSYS codebase. The paper closes with thoughts regarding the organization of the OSeMOSYS community, associated capacity development efforts, and linkages to other open source efforts including adding functionality to the LEAP model."
