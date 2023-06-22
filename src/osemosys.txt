@@ -23,12 +23,12 @@
 #   limitations under the License.
 # ============================================================================
 #
-																																																																																																																																																																																																							   
- 
+
+
 #  To run OSeMOSYS, enter the following line into your command prompt:
 #
 #  glpsol -m osemosys.txt -d datafile.txt -o results.txt
-																																																																																																																																																																										  
+
 #
 #              			#########################################
 ######################			Model Definition				#############
@@ -78,15 +78,15 @@ param DiscountRateStorage{r in REGION, s in STORAGE};
 param DiscountFactorStorage{r in REGION, s in STORAGE, y in YEAR} :=
 	(1 + DiscountRateStorage[r, s]) ^ (y - min{yy in YEAR} min(yy) + 0.0);
 param DiscountFactorMidStorage{r in REGION, s in STORAGE, y in YEAR} :=
-	(1 + DiscountRateStorage[r, s]) ^ (y - min{yy in YEAR} min(yy) + 0.5);  
-  
+	(1 + DiscountRateStorage[r, s]) ^ (y - min{yy in YEAR} min(yy) + 0.5);
+
 param DaySplit{lh in DAILYTIMEBRACKET, y in YEAR};
 param Conversionls{l in TIMESLICE, ls in SEASON} binary;
 param Conversionld{l in TIMESLICE, ld in DAYTYPE} binary;
 param Conversionlh{l in TIMESLICE, lh in DAILYTIMEBRACKET} binary;
 param DaysInDayType{ls in SEASON, ld in DAYTYPE, y in YEAR};
 param TradeRoute {r in REGION, rr in REGION, f in FUEL, y in YEAR} binary;
-param DepreciationMethod{r in REGION};
+param DepreciationMethod{r in REGION} integer;
 
 #
 ########			Demands 					#############
@@ -162,7 +162,7 @@ param AnnualEmissionLimit{r in REGION, e in EMISSION, y in YEAR};
 param ModelPeriodExogenousEmission{r in REGION, e in EMISSION};
 param ModelPeriodEmissionLimit{r in REGION, e in EMISSION};
 #
-																																																																															
+
 ##############
 ##
 ########################################################################
@@ -229,10 +229,10 @@ var StorageLevelDayTypeStart{r in REGION, s in STORAGE, ls in SEASON, ld in DAYT
 var StorageLevelDayTypeFinish{r in REGION, s in STORAGE, ls in SEASON, ld in DAYTYPE, y in YEAR} >=0;
 var StorageLowerLimit{r in REGION, s in STORAGE, y in YEAR}>=0;
 var StorageUpperLimit{r in REGION, s in STORAGE, y in YEAR} >=0;
-																																																																																																																																																	  
+
 var AccumulatedNewStorageCapacity{r in REGION, s in STORAGE, y in YEAR} >=0;
 var NewStorageCapacity{r in REGION, s in STORAGE, y in YEAR} >=0;
-																																																																																																																																																																												  
+
 var CapitalInvestmentStorage{r in REGION, s in STORAGE, y in YEAR} >=0;
 var DiscountedCapitalInvestmentStorage{r in REGION, s in STORAGE, y in YEAR} >=0;
 var SalvageValueStorage{r in REGION, s in STORAGE, y in YEAR} >=0;
@@ -265,28 +265,12 @@ var UseByTechnologyAnnual{r in REGION, t in TECHNOLOGY, f in FUEL, y in YEAR}>= 
 var RateOfUse{r in REGION, l in TIMESLICE, f in FUEL, y in YEAR}>= 0;
 var UseByTechnology{r in REGION, l in TIMESLICE, t in TECHNOLOGY, f in FUEL, y in YEAR}>= 0;
 var Use{r in REGION, l in TIMESLICE, f in FUEL, y in YEAR}>= 0;
-var Trade{r in REGION, rr in REGION, l in TIMESLICE, f in FUEL, y in YEAR};
+var Trade{r in REGION, rr in REGION, l in TIMESLICE, f in FUEL, y in YEAR: r <> rr};
 var TradeAnnual{r in REGION, rr in REGION, f in FUEL, y in YEAR};
 #
 var ProductionAnnual{r in REGION, f in FUEL, y in YEAR}>= 0;
 var UseAnnual{r in REGION, f in FUEL, y in YEAR}>= 0;
-	   
- 
-	   
-																																																																 
-																																																																																																																																				  
-																																																																																																	
-																																																																																																																																																																			 
-																																																																																																		 
-																																																																																																																																																																																																																			  
-																																																																																																																														  
-																																																																																																																																										 
-																																																																																																																																										   
-																																																																																																													   
-																																																																																								
-																																																																																																																																																																										 
-																																																																																																																																										 
-																																																																																																	   
+
 #
 #########		    Costing Variables 			#############
 #
@@ -296,12 +280,12 @@ var DiscountedCapitalInvestment{r in REGION, t in TECHNOLOGY, y in YEAR}>= 0;
 var SalvageValue{r in REGION, t in TECHNOLOGY, y in YEAR}>= 0;
 var DiscountedSalvageValue{r in REGION, t in TECHNOLOGY, y in YEAR}>= 0;
 var OperatingCost{r in REGION, t in TECHNOLOGY, y in YEAR}>= 0;
- 
-																																																																										
-																																																																																																		   
+
+
+
 var DiscountedOperatingCost{r in REGION, t in TECHNOLOGY, y in YEAR}>= 0;
-																																																																																																					  
-																																																																																																													   
+
+
 #
 var AnnualVariableOperatingCost{r in REGION, t in TECHNOLOGY, y in YEAR}>= 0;
 var AnnualFixedOperatingCost{r in REGION, t in TECHNOLOGY, y in YEAR}>= 0;
@@ -312,7 +296,7 @@ var TotalDiscountedCost{r in REGION, y in YEAR}>= 0;
 var ModelPeriodCostByRegion{r in REGION} >= 0;
 #
 #########			Reserve Margin				#############
- 
+
 #
 var TotalCapacityInReserveMargin{r in REGION, y in YEAR}>= 0;
 var DemandNeedingReserveMargin{r in REGION,l in TIMESLICE, y in YEAR}>= 0;
@@ -331,35 +315,13 @@ var AnnualTechnologyEmissionsPenalty{r in REGION, t in TECHNOLOGY, y in YEAR}>=0
 var DiscountedTechnologyEmissionsPenalty{r in REGION, t in TECHNOLOGY, y in YEAR}>=0;
 var AnnualEmissions{r in REGION, e in EMISSION, y in YEAR}>=0;
 var ModelPeriodEmissions{r in REGION, e in EMISSION}>=0;
-	  
-																																																																																																																														   
-	   
-																																																																															 
-																																																																																																																																																																																		 
-#
-																																																																																																																																																																		   
-																																																																																																																									
-																																																																																																		   
+
 ######################
 # Objective Function #
 ######################
 #
 minimize cost: sum{r in REGION, y in YEAR} TotalDiscountedCost[r,y];
-					  
-					  
- 
-																																																					  
-	 
-		 
-			 
-				 
-																																																																																																												   
-																																																							 
-																																																																														   
-																																																																																							   
-																																																																																																																																					
-																														 
-																																																										  
+
 #
 #####################
 # Constraints       #
@@ -420,16 +382,13 @@ s.t. EBa1_RateOfFuelProduction1{
 	=
 	RateOfProductionByTechnologyByMode[r,l,t,m,f,y];
 
-s.t. EBa2_RateOfFuelProduction2{r in REGION, l in TIMESLICE, f in FUEL, t in TECHNOLOGY, y in YEAR
-								# : (sum{m in MODE_OF_OPERATION} OutputActivityRatio[r,t,f,m,y]) <> 0
-								}:
-	sum{m in MODE_OF_OPERATION: OutputActivityRatio[r,t,f,m,y] <> 0} RateOfProductionByTechnologyByMode[r,l,t,m,f,y]
+s.t. EBa2_RateOfFuelProduction2{r in REGION, l in TIMESLICE, f in FUEL, t in TECHNOLOGY, y in YEAR: sum{m in MODE_OF_OPERATION} OutputActivityRatio[r,t,f,m,y] <> 0}:
+	sum{m in MODE_OF_OPERATION} RateOfProductionByTechnologyByMode[r,l,t,m,f,y]
 	=
 	RateOfProductionByTechnology[r,l,t,f,y];
 
-s.t. EBa3_RateOfFuelProduction3{r in REGION, l in TIMESLICE, f in FUEL, y in YEAR:
-							    (sum{t in TECHNOLOGY, m in MODE_OF_OPERATION} OutputActivityRatio[r,t,f,m,y]) <> 0}:
-	sum{t in TECHNOLOGY} RateOfProductionByTechnology[r,l,t,f,y]
+s.t. EBa3_RateOfFuelProduction3{r in REGION, l in TIMESLICE, f in FUEL, y in YEAR}:
+	sum{t in TECHNOLOGY: sum{m in MODE_OF_OPERATION} OutputActivityRatio[r,t,f,m,y] <> 0} RateOfProductionByTechnology[r,l,t,f,y]
 	=
 	RateOfProduction[r,l,f,y];
 
@@ -471,7 +430,7 @@ s.t. EBa9_EnergyBalanceEachTS3{r in REGION, l in TIMESLICE, f in FUEL, y in YEAR
 	Demand[r,l,f,y];
 
 s.t. EBa10_EnergyBalanceEachTS4{r in REGION, rr in REGION, l in TIMESLICE, f in FUEL, y in YEAR:
-								TradeRoute[r,rr,f,y] <> 0}:
+								TradeRoute[r,rr,f,y] <> 0 && (r <> rr)}:
 	Trade[r,rr,l,f,y]
 	=
 	-Trade[rr,r,l,f,y];
@@ -479,7 +438,7 @@ s.t. EBa10_EnergyBalanceEachTS4{r in REGION, rr in REGION, l in TIMESLICE, f in 
 s.t. EBa11_EnergyBalanceEachTS5{r in REGION, l in TIMESLICE, f in FUEL, y in YEAR}:
 	Production[r,l,f,y]
 	>=
-	Demand[r,l,f,y] + Use[r,l,f,y] + sum{rr in REGION} Trade[r,rr,l,f,y] * TradeRoute[r,rr,f,y];
+	Demand[r,l,f,y] + Use[r,l,f,y] + sum{rr in REGION: r <> rr} Trade[r,rr,l,f,y] * TradeRoute[r,rr,f,y];
 
 #
 #########        	Energy Balance B		 	#############
@@ -494,7 +453,7 @@ s.t. EBb2_EnergyBalanceEachYear2{r in REGION, f in FUEL, y in YEAR}:
 	=
 	UseAnnual[r,f,y];
 
-s.t. EBb3_EnergyBalanceEachYear3{r in REGION, rr in REGION, f in FUEL, y in YEAR}:
+s.t. EBb3_EnergyBalanceEachYear3{r in REGION, rr in REGION, f in FUEL, y in YEAR: (r <> rr)}:
 	sum{l in TIMESLICE} Trade[r,rr,l,f,y]
 	=
 	TradeAnnual[r,rr,f,y];
@@ -507,12 +466,14 @@ s.t. EBb4_EnergyBalanceEachYear4{r in REGION, f in FUEL, y in YEAR}:
 #
 #########        	Accounting Technology Production/Use	#############
 #
-s.t. Acc1_FuelProductionByTechnology{r in REGION, l in TIMESLICE, t in TECHNOLOGY, f in FUEL, y in YEAR}:
+s.t. Acc1_FuelProductionByTechnology{r in REGION, l in TIMESLICE, t in TECHNOLOGY, f in FUEL, y in YEAR:
+	(sum{m in MODE_OF_OPERATION} OutputActivityRatio[r,t,f,m,y]) <> 0}:
 	RateOfProductionByTechnology[r,l,t,f,y] * YearSplit[l,y]
 	=
 	ProductionByTechnology[r,l,t,f,y];
 
-s.t. Acc2_FuelUseByTechnology{r in REGION, l in TIMESLICE, t in TECHNOLOGY, f in FUEL, y in YEAR}:
+s.t. Acc2_FuelUseByTechnology{r in REGION, l in TIMESLICE, t in TECHNOLOGY, f in FUEL, y in YEAR:
+	(sum{m in MODE_OF_OPERATION} InputActivityRatio[r,t,f,m,y]) <> 0}:
 	RateOfUseByTechnology[r,l,t,f,y] * YearSplit[l,y]
 	=
 	UseByTechnology[r,l,t,f,y];
@@ -525,7 +486,7 @@ s.t. Acc3_AverageAnnualRateOfActivity{r in REGION, t in TECHNOLOGY, m in MODE_OF
 s.t. Acc4_ModelPeriodCostByRegion{r in REGION}:
 	sum{y in YEAR}TotalDiscountedCost[r,y] = ModelPeriodCostByRegion[r];
 
-#
+
 #########        	Storage Equations			#############
 #
 s.t. S1_RateOfStorageCharge{r in REGION, s in STORAGE, ls in SEASON, ld in DAYTYPE, lh in DAILYTIMEBRACKET, y in YEAR}:
@@ -618,17 +579,13 @@ s.t. SI5_DiscountingCapitalInvestmentStorage{r in REGION, s in STORAGE, y in YEA
 s.t. SI6_SalvageValueStorageAtEndOfPeriod1{r in REGION, s in STORAGE, y in YEAR: (y+OperationalLifeStorage[r,s]-1) <= (max{yy in YEAR} max(yy))}: 0 = SalvageValueStorage[r,s,y];
 s.t. SI7_SalvageValueStorageAtEndOfPeriod2{r in REGION, s in STORAGE, y in YEAR: (DepreciationMethod[r]=1 && (y+OperationalLifeStorage[r,s]-1) > (max{yy in YEAR} max(yy)) && DiscountRateStorage[r,s]=0) || (DepreciationMethod[r]=2 && (y+OperationalLifeStorage[r,s]-1) > (max{yy in YEAR} max(yy)))}: CapitalInvestmentStorage[r,s,y]*(1-(max{yy in YEAR} max(yy) - y+1)/OperationalLifeStorage[r,s]) = SalvageValueStorage[r,s,y];
 s.t. SI8_SalvageValueStorageAtEndOfPeriod3{r in REGION, s in STORAGE, y in YEAR: DepreciationMethod[r]=1 && (y+OperationalLifeStorage[r,s]-1) > (max{yy in YEAR} max(yy)) && DiscountRateStorage[r,s]>0}: CapitalInvestmentStorage[r,s,y]*(1-(((1+DiscountRateStorage[r,s])^(max{yy in YEAR} max(yy) - y+1)-1)/((1+DiscountRateStorage[r,s])^OperationalLifeStorage[r,s]-1))) = SalvageValueStorage[r,s,y];
-																																																											
-																																																																																																																																																																																																																																																	  
-																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																					  
-																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																									
-																																																																																																																																																																																																																																																																																																														   
 s.t. SI9_SalvageValueStorageDiscountedToStartYear{r in REGION, s in STORAGE, y in YEAR}: SalvageValueStorage[r,s,y]/((1+DiscountRateStorage[r,s])^(max{yy in YEAR} max(yy)-min{yy in YEAR} min(yy)+1)) = DiscountedSalvageValueStorage[r,s,y];
 s.t. SI10_TotalDiscountedCostByStorage{r in REGION, s in STORAGE, y in YEAR}: DiscountedCapitalInvestmentStorage[r,s,y]-DiscountedSalvageValueStorage[r,s,y] = TotalDiscountedStorageCost[r,s,y];
 #
 #########       	Capital Costs 		     	#############
 #
-s.t. CC1_UndiscountedCapitalInvestment{r in REGION, t in TECHNOLOGY, y in YEAR}: CapitalCost[r,t,y] * NewCapacity[r,t,y] * CapitalRecoveryFactor[r,t] * PvAnnuity[r,t] = CapitalInvestment[r,t,y];
+s.t. CC1_UndiscountedCapitalInvestment{r in REGION, t in TECHNOLOGY, y in YEAR}:
+	CapitalCost[r,t,y] * CapitalRecoveryFactor[r,t] * PvAnnuity[r,t] * NewCapacity[r,t,y] = CapitalInvestment[r,t,y];
 
 s.t. CC2_DiscountingCapitalInvestment{r in REGION, t in TECHNOLOGY, y in YEAR}: CapitalInvestment[r,t,y]  / DiscountFactor[r,y] = DiscountedCapitalInvestment[r,t,y];
 
@@ -644,7 +601,7 @@ s.t. SV4_SalvageValueDiscountedToStartYear{r in REGION, t in TECHNOLOGY, y in YE
 #########        	Operating Costs 		 	#############
 #
 
-s.t. OC1_OperatingCostsVariable{r in REGION, t in TECHNOLOGY, l in TIMESLICE, y in YEAR: sum{m in MODE_OF_OPERATION} VariableCost[r,t,m,y] <> 0}:
+s.t. OC1_OperatingCostsVariable{r in REGION, t in TECHNOLOGY, y in YEAR: sum{m in MODE_OF_OPERATION} VariableCost[r,t,m,y] <> 0}:
 	sum{m in MODE_OF_OPERATION}
 	TotalAnnualTechnologyActivityByMode[r,t,m,y] * VariableCost[r,t,m,y]
 	=
@@ -664,58 +621,44 @@ s.t. OC4_DiscountedOperatingCostsTotalAnnual{r in REGION, t in TECHNOLOGY, y in 
 	OperatingCost[r,t,y] / DiscountFactorMid[r, y]
 	=
 	DiscountedOperatingCost[r,t,y];
-  
+
 #
 #########       	Total Discounted Costs	 	#############
 #
 s.t. TDC1_TotalDiscountedCostByTechnology{r in REGION, t in TECHNOLOGY, y in YEAR}: DiscountedOperatingCost[r,t,y]+DiscountedCapitalInvestment[r,t,y]+DiscountedTechnologyEmissionsPenalty[r,t,y]-DiscountedSalvageValue[r,t,y] = TotalDiscountedCostByTechnology[r,t,y];
 s.t. TDC2_TotalDiscountedCost{r in REGION, y in YEAR}: sum{t in TECHNOLOGY} TotalDiscountedCostByTechnology[r,t,y]+sum{s in STORAGE} TotalDiscountedStorageCost[r,s,y] = TotalDiscountedCost[r,y];
-																																																																													  
+
 #
 #########      		Total Capacity Constraints 	##############
 #
 s.t. TCC1_TotalAnnualMaxCapacityConstraint{r in REGION, t in TECHNOLOGY, y in YEAR: TotalAnnualMaxCapacity[r,t,y] <> -1}: TotalCapacityAnnual[r,t,y] <= TotalAnnualMaxCapacity[r,t,y];
- 
-																																																																																																																		 
- 
-																																																																																																																																																																																		  
+
 s.t. TCC2_TotalAnnualMinCapacityConstraint{r in REGION, t in TECHNOLOGY, y in YEAR: TotalAnnualMinCapacity[r,t,y]>0}: TotalCapacityAnnual[r,t,y] >= TotalAnnualMinCapacity[r,t,y];
 #
 #########    		New Capacity Constraints  	##############
 #
 s.t. NCC1_TotalAnnualMaxNewCapacityConstraint{r in REGION, t in TECHNOLOGY, y in YEAR: TotalAnnualMaxCapacityInvestment[r,t,y] <> -1}: NewCapacity[r,t,y] <= TotalAnnualMaxCapacityInvestment[r,t,y];
- 
-																																																																														
- 
+
+
+
 s.t. NCC2_TotalAnnualMinNewCapacityConstraint{r in REGION, t in TECHNOLOGY, y in YEAR: TotalAnnualMinCapacityInvestment[r,t,y]>0}: NewCapacity[r,t,y] >= TotalAnnualMinCapacityInvestment[r,t,y];
 #
 #########   		Annual Activity Constraints	##############
-																																																																														
-																																																																																																																																																																																																																																																																																						  
- 
-																																																																																																													
- 
-																																																																																																												
-																																																																																							  
-																																																								 
-																																																												 
-	  
+
 #
 s.t. AAC1_TotalAnnualTechnologyActivity{r in REGION, t in TECHNOLOGY, y in YEAR}: sum{l in TIMESLICE} RateOfTotalActivity[r,t,l,y]*YearSplit[l,y] = TotalTechnologyAnnualActivity[r,t,y];
 s.t. AAC2_TotalAnnualTechnologyActivityUpperLimit{r in REGION, t in TECHNOLOGY, y in YEAR: TotalTechnologyAnnualActivityUpperLimit[r,t,y] <> -1}: TotalTechnologyAnnualActivity[r,t,y] <= TotalTechnologyAnnualActivityUpperLimit[r,t,y] ;
 s.t. AAC3_TotalAnnualTechnologyActivityLowerLimit{r in REGION, t in TECHNOLOGY, y in YEAR: TotalTechnologyAnnualActivityLowerLimit[r,t,y]>0}: TotalTechnologyAnnualActivity[r,t,y] >= TotalTechnologyAnnualActivityLowerLimit[r,t,y] ;
 #
 #########    		Total Activity Constraints 	##############
-																																																											
-																																																	 
+
 #
 s.t. TAC1_TotalModelHorizonTechnologyActivity{r in REGION, t in TECHNOLOGY}: sum{y in YEAR} TotalTechnologyAnnualActivity[r,t,y] = TotalTechnologyModelPeriodActivity[r,t];
 s.t. TAC2_TotalModelHorizonTechnologyActivityUpperLimit{r in REGION, t in TECHNOLOGY: TotalTechnologyModelPeriodActivityUpperLimit[r,t]<>-1}: TotalTechnologyModelPeriodActivity[r,t] <= TotalTechnologyModelPeriodActivityUpperLimit[r,t] ;
 s.t. TAC3_TotalModelHorizenTechnologyActivityLowerLimit{r in REGION, t in TECHNOLOGY: TotalTechnologyModelPeriodActivityLowerLimit[r,t]>0}: TotalTechnologyModelPeriodActivity[r,t] >= TotalTechnologyModelPeriodActivityLowerLimit[r,t] ;
 #
 #########   		Reserve Margin Constraint	############## NTS: Should change demand for production
-																																																	 
-																																																											
+
 #
 s.t. RM1_ReserveMargin_TechnologiesIncluded_In_Activity_Units{r in REGION, l in TIMESLICE, y in YEAR: ReserveMargin[r,y] > 0}:
 	sum {t in TECHNOLOGY}
@@ -736,30 +679,19 @@ s.t. RM3_ReserveMargin_Constraint{r in REGION, l in TIMESLICE, y in YEAR: Reserv
 
 #
 #########   		RE Production Target		############## NTS: Should change demand for production
-  
 
- 
-																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																	
 #
-s.t. RE1_FuelProductionByTechnologyAnnual{r in REGION, t in TECHNOLOGY, f in FUEL, y in YEAR}: sum{l in TIMESLICE} ProductionByTechnology[r,l,t,f,y] = ProductionByTechnologyAnnual[r,t,f,y];
-s.t. RE2_TechIncluded{r in REGION, y in YEAR}: sum{t in TECHNOLOGY, f in FUEL} ProductionByTechnologyAnnual[r,t,f,y]*RETagTechnology[r,t,y] = TotalREProductionAnnual[r,y];
-s.t. RE3_FuelIncluded{r in REGION, y in YEAR}: sum{l in TIMESLICE, f in FUEL} RateOfProduction[r,l,f,y]*YearSplit[l,y]*RETagFuel[r,f,y] = RETotalProductionOfTargetFuelAnnual[r,y];
+s.t. RE1_FuelProductionByTechnologyAnnual{r in REGION, t in TECHNOLOGY, f in FUEL, y in YEAR: sum{m in MODE_OF_OPERATION} OutputActivityRatio[r,t,f,m,y] > 0}:
+	sum{l in TIMESLICE} ProductionByTechnology[r,l,t,f,y] = ProductionByTechnologyAnnual[r,t,f,y];
+s.t. RE2_TechIncluded{r in REGION, y in YEAR}: sum{t in TECHNOLOGY, f in FUEL} ProductionByTechnologyAnnual[r,t,f,y] * RETagTechnology[r,t,y] = TotalREProductionAnnual[r,y];
+s.t. RE3_FuelIncluded{r in REGION, y in YEAR}: sum{l in TIMESLICE, f in FUEL} RateOfProduction[r,l,f,y]*YearSplit[l,y] * RETagFuel[r,f,y] = RETotalProductionOfTargetFuelAnnual[r,y];
 s.t. RE4_EnergyConstraint{r in REGION, y in YEAR}:REMinProductionTarget[r,y]*RETotalProductionOfTargetFuelAnnual[r,y] <= TotalREProductionAnnual[r,y];
-s.t. RE5_FuelUseByTechnologyAnnual{r in REGION, t in TECHNOLOGY, f in FUEL, y in YEAR}: sum{l in TIMESLICE} RateOfUseByTechnology[r,l,t,f,y]*YearSplit[l,y] = UseByTechnologyAnnual[r,t,f,y];
+s.t. RE5_FuelUseByTechnologyAnnual{r in REGION, t in TECHNOLOGY, f in FUEL, y in YEAR: sum{m in MODE_OF_OPERATION} InputActivityRatio[r,t,f,m,y] > 0}:
+	sum{l in TIMESLICE}
+		RateOfUseByTechnology[r,l,t,f,y]*YearSplit[l,y] = UseByTechnologyAnnual[r,t,f,y];
 #
 #########   		Emissions Accounting		##############
-																														 
-																																																				 
- 
-																																																																																																																																																																																																																																																																																																																																																																																																											 
-																																																																																																																																																																																																																																																																																																																																																																																									 
-																																																																																																																																																																																																																																																																																																																																																																																																																																																					  
-																																																																																																																																																																																																																																																																																																																																																																			 
-																																																																																																																																																														 
-																																																																																																						
-																																																																																																	
-	   
-																																																																  
+
 #
 s.t. E1_AnnualEmissionProductionByMode{r in REGION, t in TECHNOLOGY, e in EMISSION, m in MODE_OF_OPERATION, y in YEAR:
 									   EmissionActivityRatio[r,t,e,m,y] <> 0}:
@@ -811,7 +743,7 @@ s.t. E9_ModelPeriodEmissionsLimit{r in REGION, e in EMISSION: ModelPeriodEmissio
 #
 ###########################################################################################
 #
- 
+
 # Solve the problem
 solve;
 #
@@ -823,7 +755,7 @@ solve;
 #                                                                                                                                                                                                                #
 #########################################################################################################
 #
-																																																																																																																																																																																																																				  
+
 ####        Summary results         ###
 #
 ###                Total costs and emissions by region        ###
@@ -1140,8 +1072,8 @@ table AccumulatedNewCapacityResults
 	OUT "CSV"
 	ResultsPath & "/AccumulatedNewCapacity.csv" :
 	r~REGION, t~TECHNOLOGY, y~YEAR, AccumulatedNewCapacity[r, t, y]~VALUE;
-																																																															
-			 
+
+
 
 table AnnualEmissionsResults
 	{r in REGION, e in EMISSION, y in YEAR:
@@ -1150,21 +1082,21 @@ table AnnualEmissionsResults
 	OUT "CSV"
 	ResultsPath & "/AnnualEmissions.csv" :
 	r~REGION, e~EMISSION, y~YEAR, AnnualEmissions[r, e, y]~VALUE;
-																																																			 
-			 
+
+
 
 table AnnualFixedOperatingCostResults
 	{r in REGION, t in TECHNOLOGY, y in YEAR:
 		AnnualFixedOperatingCost[r, t, y] > 0}
 
-																																																												 
-																																																							 
+
+
 	OUT "CSV"
 	ResultsPath & "/AnnualFixedOperatingCost.csv" :
 	r~REGION, t~TECHNOLOGY, y~YEAR, AnnualFixedOperatingCost[r, t, y]~VALUE;
-		 
-			 
-																																																														  
+
+
+
 
 table AnnualTechnologyEmissionResults
 	{r in REGION, t in TECHNOLOGY, e in EMISSION, y in YEAR:
@@ -1173,8 +1105,8 @@ table AnnualTechnologyEmissionResults
 	OUT "CSV"
 	ResultsPath & "/AnnualTechnologyEmission.csv" :
 	r~REGION, t~TECHNOLOGY, e~EMISSION, y~YEAR, AnnualTechnologyEmission[r, t, e, y]~VALUE;
-																																																			 
-			 
+
+
 
 table AnnualTechnologyEmissionByModeResults
 	{r in REGION, t in TECHNOLOGY, e in EMISSION, m in MODE_OF_OPERATION, y in YEAR:
@@ -1182,8 +1114,8 @@ table AnnualTechnologyEmissionByModeResults
 	OUT "CSV"
 	ResultsPath & "/AnnualTechnologyEmissionByMode.csv" :
 	r~REGION, t~TECHNOLOGY, e~EMISSION, m~MODE_OF_OPERATION, y~YEAR, AnnualTechnologyEmissionByMode[r, t, e, m, y]~VALUE;
-																																																																																																																											 
-			 
+
+
 
 table AnnualVariableOperatingCostResults
 	{r in REGION, t in TECHNOLOGY, y in YEAR:
@@ -1192,8 +1124,8 @@ table AnnualVariableOperatingCostResults
 	OUT "CSV"
 	ResultsPath & "/AnnualVariableOperatingCost.csv" :
 	r~REGION, t~TECHNOLOGY, y~YEAR, AnnualVariableOperatingCost[r, t, y]~VALUE;
-																																																																											  
-			 
+
+
 
 table CapitalInvestmentResults
 	{r in REGION, t in TECHNOLOGY, y in YEAR:
@@ -1259,7 +1191,7 @@ table ProductionByTechnologyResults
 	ResultsPath & "/ProductionByTechnology.csv" :
 	r~REGION, l~TIMESLICE, t~TECHNOLOGY, f~FUEL, y~YEAR,
 	ProductionByTechnology[r, l, t, f, y]~VALUE;
-			 
+
 
 table ProductionByTechnologyAnnualResults
 	{r in REGION, t in TECHNOLOGY, f in FUEL, y in YEAR:
@@ -1269,7 +1201,7 @@ table ProductionByTechnologyAnnualResults
 	ResultsPath & "/ProductionByTechnologyAnnual.csv" :
 	r~REGION, t~TECHNOLOGY, f~FUEL, y~YEAR,
 	ProductionByTechnologyAnnual[r, t, f, y]~VALUE;
-			 
+
 
 table RateOfActivityResults
 	{r in REGION, l in TIMESLICE, t in TECHNOLOGY, m in MODE_OF_OPERATION, y in YEAR:
@@ -1277,7 +1209,7 @@ table RateOfActivityResults
 	OUT "CSV"
 	ResultsPath & "/RateOfActivity.csv" :
 	r~REGION, l~TIMESLICE, t~TECHNOLOGY, m~MODE_OF_OPERATION, y~YEAR, RateOfActivity[r, l, t, m, y]~VALUE;
-																																																			 
+
 
 table RateOfProductionByTechnologyResults
 	{r in REGION, l in TIMESLICE, t in TECHNOLOGY, f in FUEL, y in YEAR:
@@ -1287,7 +1219,7 @@ table RateOfProductionByTechnologyResults
 	ResultsPath & "/RateOfProductionByTechnology.csv" :
 	r~REGION, l~TIMESLICE, t~TECHNOLOGY, f~FUEL, y~YEAR,
 	RateOfProductionByTechnology[r, l, t, f, y]~VALUE;
-			 
+
 
 table RateOfProductionByTechnologyByModeResults
 	{r in REGION, l in TIMESLICE, t in TECHNOLOGY, m in MODE_OF_OPERATION, f in FUEL, y in YEAR:
@@ -1304,7 +1236,7 @@ table RateOfUseByTechnologyResults
 	OUT "CSV"
 	ResultsPath & "/RateOfUseByTechnology.csv" :
 	r~REGION, l~TIMESLICE, t~TECHNOLOGY, f~FUEL, y~YEAR,
-																																																			 
+
 	RateOfUseByTechnology[r, l, t, f, y]~VALUE;
 
 table RateOfUseByTechnologyByModeResults
@@ -1321,7 +1253,7 @@ table SalvageValueResults
 	OUT "CSV"
 	ResultsPath & "/SalvageValue.csv" :
 	r~REGION, t~TECHNOLOGY, y~YEAR, SalvageValue[r, t, y]~VALUE;
-																																																		  
+
 
 table SalvageValueStorageResults
 	{r in REGION, s in STORAGE, y in YEAR:
@@ -1329,30 +1261,30 @@ table SalvageValueStorageResults
 	OUT "CSV"
 	ResultsPath & "/SalvageValueStorage.csv" :
 	r~REGION, s~STORAGE, y~YEAR, SalvageValueStorage[r, s, y]~VALUE;
-																																																	 
-			 
-																																																							 
-																											
-																																																															
 
-																																																	 
-																																																																																																														 
-																																	   
-																																																			 
-			 
+
+
+
+
+
+
+
+
+
+
 
 table TotalAnnualTechnologyActivityByModeResults
 	{r in REGION, t in TECHNOLOGY, m in MODE_OF_OPERATION, y in YEAR:
 		TotalAnnualTechnologyActivityByMode[r, t, m, y] > 0}
 
-																														   
-																																																							 
+
+
 	OUT "CSV"
 	ResultsPath & "/TotalAnnualTechnologyActivityByMode.csv" :
 	r~REGION, t~TECHNOLOGY, m~MODE_OF_OPERATION, y~YEAR,
 	TotalAnnualTechnologyActivityByMode[r, t, m, y]~VALUE;
-			 
-																																																							 
+
+
 
 table TotalCapacityAnnualResults
 	{r in REGION, t in TECHNOLOGY, y in YEAR:
@@ -1368,58 +1300,58 @@ table TotalDiscountedCostResults
 	ResultsPath & "/TotalDiscountedCost.csv" :
 	r~REGION, y~YEAR,
 	TotalDiscountedCost[r, y]~VALUE;
-		  
-																																																			 
-				  
-																									   
-																																																																															  
-																																																																																																													   
-																																																		 
-																																																																																																																																																																										  
-																																																																																								 
-																																																		 
-																																																			 
+
+
+
+
+
+
+
+
+
+
+
 
 table TotalTechnologyAnnualActivityResults
 	{r in REGION, t in TECHNOLOGY, y in YEAR:
 		TotalTechnologyAnnualActivity[r, t, y] > 0}
 
-																																																				 
+
 	OUT "CSV"
 	ResultsPath & "/TotalTechnologyAnnualActivity.csv" :
 	r~REGION, t~TECHNOLOGY, y~YEAR,
 	TotalTechnologyAnnualActivity[r, t, y]~VALUE;
-			 
+
 
 table TotalTechnologyModelPeriodActivityResults
 	{r in REGION, t in TECHNOLOGY:
 		TotalTechnologyModelPeriodActivity[r, t] > 0}
 
-																																																																  
+
 	OUT "CSV"
 	ResultsPath & "/TotalTechnologyModelPeriodActivity.csv" :
 	r~REGION, t~TECHNOLOGY,
 	TotalTechnologyModelPeriodActivity[r, t]~VALUE;
-			 
+
 
 table TradeResults
 	{r in REGION, rr in REGION, l in TIMESLICE, f in FUEL, y in YEAR:
-		Trade[r, rr, l, f, y] <> 0}
+		(r <> rr) && (Trade[r, rr, l, f, y] <> 0) }
 
 	OUT "CSV"
 	ResultsPath & "/Trade.csv" :
 	r~REGION, rr~REGION, l~TIMESLICE, f~FUEL, y~YEAR, Trade[r, rr, l, f, y]~VALUE;
-			 
+
 
 table UseByTechnologyResults
 	{r in REGION, l in TIMESLICE, t in TECHNOLOGY, f in FUEL, y in YEAR:
-																											
+
 		UseByTechnology[r, l, t, f, y] > 0}
-																																			 
+
 	OUT "CSV"
 	ResultsPath & "/UseByTechnology.csv" :
 	r~REGION, l~TIMESLICE, t~TECHNOLOGY, f~FUEL, y~YEAR, UseByTechnology[r, l, t, f, y]~VALUE;
-			
-			 
+
+
 
 end;
