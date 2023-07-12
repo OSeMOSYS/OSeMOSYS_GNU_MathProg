@@ -1,5 +1,33 @@
 # OSeMOSYS Change Log
 
+### Change of ReserveMargin Calculation
+The ReserveMargin has so far been calculated in relation to the TimeSlice with the highest demand. 
+However, often the time slices in OSeMOSYS models do not represent exactly one hour. Therefore this approach
+does not reflect the estimation of real world ReserveMargin calculation. 
+This commit changes the way the ReserveMargin in OSeMOSYS is being calculated. 
+By introducing the new parameter AnnualPeakHour the modeller needs to enter the demand of the hour with the 
+highest demand, if one wishes to have a ReserveMargin. Since one commonly has hourly demand data available 
+when modelling, determining the hour with the highest demand is not creating significatn additional work. 
+In the different code versions the following modifications have been made:
+**long**
+- added: 
+	param AnnualPeakHour{r in REGION, y in YEAR}
+- modified: 
+	RM1_ReserveMargin_TechnologiesIncluded_In_Activity_Units,
+	RM3_RM3_ReserveMargin_Constraint
+- taken out: 
+	RM2_ReserveMargin_FuelsIncluded
+**short**
+- added: 
+	param AnnualPeakHour{r in REGION, y in YEAR}
+- modified:
+	RM3_RM3_ReserveMargin_Constraint
+**fast**
+- added: 
+	param AnnualPeakHour{r in REGION, y in YEAR}
+- modified:
+	RM3_RM3_ReserveMargin_Constraint
+
 ## Version 1.0.0
 
 This is the first stable version of OSeMOSYS to be reduced using the Semantic Versioning pattern

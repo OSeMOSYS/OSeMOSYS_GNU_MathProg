@@ -144,7 +144,7 @@ param TotalTechnologyModelPeriodActivityLowerLimit{r in REGION, t in TECHNOLOGY}
 #########			Reserve Margin				#############
 #
 param ReserveMarginTagTechnology{r in REGION, t in TECHNOLOGY, y in YEAR} >= 0 <= 1;
-param ReserveMarginTagFuel{r in REGION, f in FUEL, y in YEAR} binary;
+param YearlyPeakCapacity{r in REGION, y in YEAR};
 param ReserveMargin{r in REGION, y in YEAR};
 #
 #########			RE Generation Target		#############
@@ -315,7 +315,7 @@ var ModelPeriodCostByRegion{r in REGION} >= 0;
  
 #
 var TotalCapacityInReserveMargin{r in REGION, y in YEAR}>= 0;
-var DemandNeedingReserveMargin{r in REGION,l in TIMESLICE, y in YEAR}>= 0;
+#var DemandNeedingReserveMargin{r in REGION,l in TIMESLICE, y in YEAR}>= 0;
 #
 #########			RE Gen Target				#############
 #
@@ -723,14 +723,10 @@ s.t. RM1_ReserveMargin_TechnologiesIncluded_In_Activity_Units{r in REGION, l in 
 	=
 	TotalCapacityInReserveMargin[r,y];
 
-s.t. RM2_ReserveMargin_FuelsIncluded{r in REGION, l in TIMESLICE, y in YEAR: ReserveMargin[r,y] > 0}:
-	sum {f in FUEL}
-	RateOfProduction[r,l,f,y] * ReserveMarginTagFuel[r,f,y]
-	=
-	DemandNeedingReserveMargin[r,l,y];
+#s.t. RM2_ReserveMargin_FuelsIncluded{r in REGION, l in TIMESLICE, y in YEAR: ReserveMargin[r,y] > 0}:	sum {f in FUEL}	RateOfProduction[r,l,f,y] * ReserveMarginTagFuel[r,f,y]	=	DemandNeedingReserveMargin[r,l,y];
 
 s.t. RM3_ReserveMargin_Constraint{r in REGION, l in TIMESLICE, y in YEAR: ReserveMargin[r,y] > 0}:
-	DemandNeedingReserveMargin[r,l,y] * ReserveMargin[r,y]
+	YearlyPeakCapacity[r,y] * ReserveMargin[r,y]
 	<=
 	TotalCapacityInReserveMargin[r,y];
 

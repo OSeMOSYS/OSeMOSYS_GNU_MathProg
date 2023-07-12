@@ -129,6 +129,12 @@ WD						0.5		0.5		0.5		0.5		0.5		0.5		0.5		0.5		0.5		0.5		0.5		0.5		0.5		0.5		0.
 WN						0.1		0.1		0.1		0.1		0.1		0.1		0.1		0.1		0.1		0.1		0.1		0.1		0.1		0.1		0.1		0.1		0.1		0.1		0.1		0.1		0.1		;
 
 #
+# YearlyPeakCapacity{r in REGION, y in YEAR} Units: PJ
+# Indicates the electricity demand in the hour of the highest demand in the year
+param	YearlyPeakCapacity	default	0	:	1990	1991	1992	1993	1994	1995	1996	1997	1998	1999	2000	2001	2002	2003	2004	2005	2006	2007	2008	2009	2010	:=
+UTOPIA									0.005677568	0.005961446	0.006245325	0.006529203	0.006813081	0.00709696	0.007380838	0.007664716	0.007948595	0.008232473	0.008516352	0.008942169	0.009367987	0.009793804	0.010219622	0.01064544	0.011071257	0.011497075	0.011922892	0.01234871	0.012774527 	;						
+
+#
 # CapacityToActivityUnit{r in REGION, t in TECHNOLOGY};  Units: PJ/GW-YR
 # Thus here we use a factor of 31.536, which is the level of energy production in PJ produced from 1 GW operating for 1 year (1GW * 8760 * 3600 / 10^6)
 param	CapacityToActivityUnit	default	1	:	E01		E21		E31		E51		E70		:=
@@ -367,13 +373,6 @@ param	EmissionsPenalty			:=
 	[UTOPIA,*,*]	:	1990	1991	1992	1993	1994	1995	1996	1997	1998	1999	2000	2001	2002	2003	2004	2005	2006	2007	2008	2009	2010	:=
 CO2						0		0		0		0		0		0		0		0		0		0		0		0		0		0		0		0		0		0		0		0		0
 NOX						0		0		0		0		0		0		0		0		0		0		0		0		0		0		0		0		0		0		0		0		0		;
-
-#
-# ReserveMarginTagFuel{r in Region,f in Fuel, y in Year} Units: 1=yes, 0=no
-# Indicates if the output fuel has a reserve margin associated with it
-param	ReserveMarginTagFuel	default	0	:=
-	[UTOPIA,*,*]	:	1990	1991	1992	1993	1994	1995	1996	1997	1998	1999	2000	2001	2002	2003	2004	2005	2006	2007	2008	2009	2010	:=
-ELC						1		1		1		1		1		1		1		1		1		1		1		1		1		1		1		1		1		1		1		1		1	;
 
 #
 # ReserveMargin{r in Region, y in Year} Units: Ratio (Installed/Peak)
