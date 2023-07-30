@@ -49,6 +49,7 @@ set SEASON;
 set DAYTYPE;
 set DAILYTIMEBRACKET;
 set STORAGE;
+set UDC;
 #
 #####################
 #    Parameters     #
@@ -162,7 +163,15 @@ param AnnualEmissionLimit{r in REGION, e in EMISSION, y in YEAR};
 param ModelPeriodExogenousEmission{r in REGION, e in EMISSION};
 param ModelPeriodEmissionLimit{r in REGION, e in EMISSION};
 #
-																																																																															
+#########			User-defined constraints	#############
+#
+param UDCMultiplierTotalCapacity{r in REGION, t in TECHNOLOGY, u in UDC, y in YEAR};
+param UDCMultiplierNewCapacity{r in REGION, t in TECHNOLOGY, u in UDC, y in YEAR};
+param UDCMultiplierActivity{r in REGION, t in TECHNOLOGY, u in UDC, y in YEAR};
+param UDCConstant{r in REGION, u in UDC, y in YEAR};
+param UDCTag{r in REGION, u in UDC};
+#
+
 ##############
 ##
 ########################################################################
@@ -808,6 +817,23 @@ s.t. E9_ModelPeriodEmissionsLimit{r in REGION, e in EMISSION: ModelPeriodEmissio
 	ModelPeriodEmissions[r,e]
 	<=
 	ModelPeriodEmissionLimit[r,e];
+#
+#########		User-defined constraints		#########
+#
+s.t. UDC0_UserDefinedConstraintEquality{r in REGION, u in UDC, y in YEAR: UDCTag[r,u] = 0}: 
+sum{t in TECHNOLOGY}UDCMultiplierTotalCapacity[r,t,u,y]*TotalCapacityAnnual[r,t,y] + 
+sum{t in TECHNOLOGY}UDCMultiplierNewCapacity[r,t,u,y]*NewCapacity[r,t,y] +
+sum{t in TECHNOLOGY}UDCMultiplierActivity[r,t,u,y]*TotalTechnologyAnnualActivity[r,t,y] = UDCConstant[r,u,y];
+
+s.t. UDC1_UserDefinedConstraintInequality{r in REGION, u in UDC, y in YEAR: UDCTag[r,u] = 1}: 
+sum{t in TECHNOLOGY}UDCMultiplierTotalCapacity[r,t,u,y]*TotalCapacityAnnual[r,t,y] + 
+sum{t in TECHNOLOGY}UDCMultiplierNewCapacity[r,t,u,y]*NewCapacity[r,t,y] +
+sum{t in TECHNOLOGY}UDCMultiplierActivity[r,t,u,y]*TotalTechnologyAnnualActivity[r,t,y] >= UDCConstant[r,u,y];
+
+s.t. UDC2_UserDefinedConstraintInequality{r in REGION, u in UDC, y in YEAR: UDCTag[r,u] = 2}: 
+sum{t in TECHNOLOGY}UDCMultiplierTotalCapacity[r,t,u,y]*TotalCapacityAnnual[r,t,y] + 
+sum{t in TECHNOLOGY}UDCMultiplierNewCapacity[r,t,u,y]*NewCapacity[r,t,y] +
+sum{t in TECHNOLOGY}UDCMultiplierActivity[r,t,u,y]*TotalTechnologyAnnualActivity[r,t,y] <= UDCConstant[r,u,y];
 #
 ###########################################################################################
 #
