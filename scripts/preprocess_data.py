@@ -165,7 +165,7 @@ def main(data_format, data_infile, data_outfile):
                                 storage = line.split(' ')[0]
                                 values = line.rstrip().split(' ')[1:]
                                 for i in range(0, len(mode_list)):
-                                    if values[i] != '0':
+                                    if float(values[i]) != '0':
                                         storage_to.append(tuple([storage, tech, mode_list[i]]))
 
                         if param_current == 'TechnologyFromStorage':
@@ -173,7 +173,7 @@ def main(data_format, data_infile, data_outfile):
                                 storage = line.split(' ')[0]
                                 values = line.rstrip().split(' ')[1:]
                                 for i in range(0, len(mode_list)):
-                                    if values[i] != '0':
+                                    if float(values[i]) != '0':
                                         storage_from.append(tuple([storage, tech, mode_list[i]]))
 
                         if param_current == 'EmissionActivityRatio':
