@@ -333,14 +333,14 @@ var ModelPeriodEmissions{r in REGION, e in EMISSION}>= 0;
 ######################
 #
 
-minimize cost: sum{r in REGION, t in TECHNOLOGY, y in YEAR} 
-    ((((sum{yy in YEAR: y-yy < OperationalLife[r,t] && y-yy>=0} 
-        NewCapacity[r,t,yy])+ ResidualCapacity[r,t,y])*FixedCost[r,t,y] + 
-        sum{m in MODEperTECHNOLOGY[t], l in TIMESLICE} 
-            RateOfActivity[r,l,t,m,y]*YearSplit[l,y]*VariableCost[r,t,m,y]) / DiscountFactorMid[r,y] + 
-            CapitalCost[r,t,y] * NewCapacity[r,t,y] * CapitalRecoveryFactor[r,t] * PvAnnuity[r,t] / DiscountFactor[r,y] + 
-            DiscountedTechnologyEmissionsPenalty[r,t,y] - DiscountedSalvageValue[r,t,y]) + 
-            sum{r in REGION, s in STORAGE, y in YEAR} (CapitalCostStorage[r,s,y] * NewStorageCapacity[r,s,y] / DiscountFactorStorage[r,s,y] - 
+minimize cost: sum{r in REGION, t in TECHNOLOGY, y in YEAR}
+    ((((sum{yy in YEAR: y-yy < OperationalLife[r,t] && y-yy>=0}
+        NewCapacity[r,t,yy])+ ResidualCapacity[r,t,y])*FixedCost[r,t,y] +
+        sum{m in MODEperTECHNOLOGY[t], l in TIMESLICE}
+            RateOfActivity[r,l,t,m,y]*YearSplit[l,y]*VariableCost[r,t,m,y]) / DiscountFactorMid[r,y] +
+            CapitalCost[r,t,y] * NewCapacity[r,t,y] * CapitalRecoveryFactor[r,t] * PvAnnuity[r,t] / DiscountFactor[r,y] +
+            DiscountedTechnologyEmissionsPenalty[r,t,y] - DiscountedSalvageValue[r,t,y]) +
+            sum{r in REGION, s in STORAGE, y in YEAR} (CapitalCostStorage[r,s,y] * NewStorageCapacity[r,s,y] / DiscountFactorStorage[r,s,y] -
             - SalvageValueStorage[r,s,y] / ((1+DiscountRateStorage[r,s])^(max{yy in YEAR} max(yy)-min{yy in YEAR} min(yy)+1)));
 
 #
@@ -535,7 +535,12 @@ s.t. RE4_EnergyConstraint{r in REGION, y in YEAR}:REMinProductionTarget[r,y]*sum
 #
 #########                   Emissions Accounting                ##############
 #
-s.t. E5_DiscountedEmissionsPenaltyByTechnology{r in REGION, t in TECHNOLOGY, y in YEAR}: sum{e in EMISSION, l in TIMESLICE, (m,tt) in MODExTECHNOLOGYperEMISSION[e]: t=tt} EmissionActivityRatio[r,t,e,m,y]*RateOfActivity[r,l,t,m,y]*YearSplit[l,y]*EmissionsPenalty[r,e,y]/DiscountFactorMid[r,y] = DiscountedTechnologyEmissionsPenalty[r,t,y];
+s.t. E5_DiscountedEmissionsPenaltyByTechnology
+{r in REGION, t in TECHNOLOGY, y in YEAR}:
+sum{e in EMISSION, l in TIMESLICE, (m,tt) in MODExTECHNOLOGYperEMISSION[e]: t=tt and EmissionActivityRatio[r,t,e,m,y]>0}
+EmissionActivityRatio[r,t,e,m,y] * RateOfActivity[r,l,t,m,y] * YearSplit[l,y] * EmissionsPenalty[r,e,y] / DiscountFactorMid[r,y]
+=
+DiscountedTechnologyEmissionsPenalty[r,t,y];
 s.t. E8_AnnualEmissionsLimit{r in REGION, e in EMISSION, y in YEAR: AnnualEmissionLimit[r,e,y] <> -1}: sum{l in TIMESLICE, (m,t) in MODExTECHNOLOGYperEMISSION[e]} EmissionActivityRatio[r,t,e,m,y]*RateOfActivity[r,l,t,m,y]*YearSplit[l,y]+AnnualExogenousEmission[r,e,y] <= AnnualEmissionLimit[r,e,y];
 s.t. E9_ModelPeriodEmissionsLimit{r in REGION, e in EMISSION: ModelPeriodEmissionLimit[r,e] <> -1}:  sum{l in TIMESLICE, (m,t) in MODExTECHNOLOGYperEMISSION[e], y in YEAR} EmissionActivityRatio[r,t,e,m,y]*RateOfActivity[r,l,t,m,y]*YearSplit[l,y] + ModelPeriodExogenousEmission[r,e] <= ModelPeriodEmissionLimit[r,e] ;
 #s.t. E1_AnnualEmissionProductionByMode{r in REGION, t in TECHNOLOGY, e in EMISSION, m in MODEperTECHNOLOGY[t], y in YEAR}: EmissionActivityRatio[r,t,e,m,y]*sum{l in TIMESLICE} RateOfActivity[r,l,t,m,y]*YearSplit[l,y]=AnnualTechnologyEmissionByMode[r,t,e,m,y];
@@ -582,22 +587,22 @@ for {r in REGION}         {
                                         }
 printf "\n" >> ResultsPath & "/SelectedResults.csv";
 printf "Cost" >> ResultsPath & "/SelectedResults.csv";
-for {r in REGION} 
-    {printf ",%g", 
+for {r in REGION}
+    {printf ",%g",
     sum{t in TECHNOLOGY, y in YEAR}
     (
         (
             (
                 (
-                    (sum{yy in YEAR: y-yy < OperationalLife[r,t] && y-yy>=0} 
-                        NewCapacity[r,t,yy]) + ResidualCapacity[r,t,y]) 
-                * FixedCost[r,t,y] + sum{m in MODEperTECHNOLOGY[t], l in TIMESLICE} 
+                    (sum{yy in YEAR: y-yy < OperationalLife[r,t] && y-yy>=0}
+                        NewCapacity[r,t,yy]) + ResidualCapacity[r,t,y])
+                * FixedCost[r,t,y] + sum{m in MODEperTECHNOLOGY[t], l in TIMESLICE}
                     RateOfActivity[r,l,t,m,y] * YearSplit[l,y] * VariableCost[r,t,m,y])
-            / DiscountFactorMid[r,y] 
-            + CapitalCost[r,t,y] * NewCapacity[r,t,y] * CapitalRecoveryFactor[r,t] * PvAnnuity[r,t] / DiscountFactor[r,y] 
-            + DiscountedTechnologyEmissionsPenalty[r,t,y] - DiscountedSalvageValue[r,t,y]) 
-        + sum{s in STORAGE} 
-            (CapitalCostStorage[r,s,y] * NewStorageCapacity[r,s,y] / DiscountFactorStorage[r,s,y] 
+            / DiscountFactorMid[r,y]
+            + CapitalCost[r,t,y] * NewCapacity[r,t,y] * CapitalRecoveryFactor[r,t] * PvAnnuity[r,t] / DiscountFactor[r,y]
+            + DiscountedTechnologyEmissionsPenalty[r,t,y] - DiscountedSalvageValue[r,t,y])
+        + sum{s in STORAGE}
+            (CapitalCostStorage[r,s,y] * NewStorageCapacity[r,s,y] / DiscountFactorStorage[r,s,y]
             - SalvageValueStorage[r,s,y] / ((1+DiscountRateStorage[r,s])^(max{yy in YEAR} max(yy)-min{yy in YEAR} min(yy)+1)))) >> ResultsPath & "/SelectedResults.csv";
 }
 printf "\n" >> ResultsPath & "/SelectedResults.csv";
